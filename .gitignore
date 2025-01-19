@@ -1,0 +1,12 @@
+
+/Content
+/Intermediate
+/Plugins/BinaryCombat/Binaries
+/Plugins/BinaryCombat/Intermediate
+/Plugins/Developer
+/Saved
+/Binaries
+/.idea
+/.vs
+.vsconfig
+BinaryCombatSample.sln
