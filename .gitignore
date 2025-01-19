@@ -1,5 +1,4 @@
 
-/Content
 /Intermediate
 /Plugins/BinaryCombat/Binaries
 /Plugins/BinaryCombat/Intermediate
@@ -10,3 +9,9 @@
 /.vs
 .vsconfig
 BinaryCombatSample.sln
+/Content/__ExternalActors__
+/Content/__ExternalObjects__
+/Content/Characters
+/Content/LevelPrototyping
+/Content/StarterContent
+/Content/ThirdPerson
