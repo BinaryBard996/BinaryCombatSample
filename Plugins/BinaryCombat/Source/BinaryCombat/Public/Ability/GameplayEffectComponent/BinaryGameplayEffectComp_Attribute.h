@@ -19,6 +19,7 @@ class BINARYCOMBAT_API UBinaryGameplayEffectComp_Attribute : public UBinaryGamep
 	GENERATED_BODY()
 
 public:
+	virtual bool CanGameplayEffectApply(const FActiveGameplayEffectsContainer& ActiveGEContainer, const FGameplayEffectSpec& GESpec) const override;
 	virtual bool OnActiveGameplayEffectAdded(FActiveGameplayEffectsContainer& ActiveGEContainer, FActiveGameplayEffect& ActiveGE) const override;
 
 protected:
@@ -28,4 +29,7 @@ protected:
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attribute Condition")
 	TArray<FBinaryAttributeCondition> RemovalAttributeConditions;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attribute Condition")
+	TArray<FBinaryAttributeCondition> OngoingAttributeConditions;
 };

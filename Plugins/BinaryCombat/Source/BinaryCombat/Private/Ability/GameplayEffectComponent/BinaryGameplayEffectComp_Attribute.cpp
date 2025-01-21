@@ -7,6 +7,29 @@
 #include "GameplayEffect.h"
 #include "Ability/BinaryAbilityTypes.h"
 
+bool UBinaryGameplayEffectComp_Attribute::CanGameplayEffectApply(
+	const FActiveGameplayEffectsContainer& ActiveGEContainer, const FGameplayEffectSpec& GESpec) const
+{
+	UAbilitySystemComponent* ASC = ActiveGEContainer.Owner;
+	if(!IsValid(ASC))
+	{
+		return false;
+	}
+
+	for(const FBinaryAttributeCondition& Condition: RemovalAttributeConditions)
+	{
+		if(Condition.CanRegisterCheck(ASC))
+		{
+			if(Condition.CheckCondition(ASC))
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
 bool UBinaryGameplayEffectComp_Attribute::OnActiveGameplayEffectAdded(
 	FActiveGameplayEffectsContainer& ActiveGEContainer, FActiveGameplayEffect& ActiveGE) const
 {
@@ -21,19 +44,27 @@ bool UBinaryGameplayEffectComp_Attribute::OnActiveGameplayEffectAdded(
 	{
 		if(Condition.CanRegisterCheck(ASC))
 		{
-			if(Condition.CheckCondition(ASC))
-			{
-				return false;
-			}
-			
 			FDelegateHandle Handle = ASC->GetGameplayAttributeValueChangeDelegate(Condition.Attribute).AddUObject(this, &UBinaryGameplayEffectComp_Attribute::OnAttributeChanged, ActiveGE.Handle);
 			AllBounds.Emplace(Condition.Attribute, Handle);
 		}
+	}
 
+	bool bOngoingFlag = true;
+	for(const FBinaryAttributeCondition& Condition: OngoingAttributeConditions)
+	{
+		if(Condition.CanRegisterCheck(ASC))
+		{
+			if(Condition.CheckCondition(ASC))
+			{
+				bOngoingFlag = false;
+				FDelegateHandle Handle = ASC->GetGameplayAttributeValueChangeDelegate(Condition.Attribute).AddUObject(this, &UBinaryGameplayEffectComp_Attribute::OnAttributeChanged, ActiveGE.Handle);
+				AllBounds.Emplace(Condition.Attribute, Handle);
+			}
+		}
 	}
 
 	ActiveGE.EventSet.OnEffectRemoved.AddUObject(this, &UBinaryGameplayEffectComp_Attribute::OnActiveGameplayEffectRemoved, ASC, MoveTemp(AllBounds));
-	return true;
+	return !bOngoingFlag;
 }
 
 void UBinaryGameplayEffectComp_Attribute::OnActiveGameplayEffectRemoved(
@@ -72,5 +103,19 @@ void UBinaryGameplayEffectComp_Attribute::OnAttributeChanged(const FOnAttributeC
 	if(bRemoveFlag)
 	{
 		ASC->RemoveActiveGameplayEffect(ActiveEffectHandle);
+		return;
 	}
+
+	
+	bool bOngoingFlag = true;
+	for(const FBinaryAttributeCondition& Condition: OngoingAttributeConditions)
+	{
+		if(!Condition.CheckCondition(ASC, AttributeChangeData))
+		{
+			bOngoingFlag = false;
+			break;
+		}
+	}
+
+	ASC->SetActiveGameplayEffectInhibit(MoveTemp(ActiveEffectHandle), !bOngoingFlag, true);
 }
