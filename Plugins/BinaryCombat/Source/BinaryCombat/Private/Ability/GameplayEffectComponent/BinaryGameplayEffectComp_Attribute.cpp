@@ -19,8 +19,17 @@ bool UBinaryGameplayEffectComp_Attribute::OnActiveGameplayEffectAdded(
 	TArray<TTuple<FGameplayAttribute, FDelegateHandle>> AllBounds;
 	for(const FBinaryAttributeCondition& Condition: RemovalAttributeConditions)
 	{
-		FDelegateHandle Handle = ASC->GetGameplayAttributeValueChangeDelegate(Condition.Attribute).AddUObject(this, &UBinaryGameplayEffectComp_Attribute::OnAttributeChanged, ActiveGE.Handle);
-		AllBounds.Emplace(Condition.Attribute, Handle);
+		if(Condition.CanRegisterCheck(ASC))
+		{
+			if(Condition.CheckCondition(ASC))
+			{
+				return false;
+			}
+			
+			FDelegateHandle Handle = ASC->GetGameplayAttributeValueChangeDelegate(Condition.Attribute).AddUObject(this, &UBinaryGameplayEffectComp_Attribute::OnAttributeChanged, ActiveGE.Handle);
+			AllBounds.Emplace(Condition.Attribute, Handle);
+		}
+
 	}
 
 	ActiveGE.EventSet.OnEffectRemoved.AddUObject(this, &UBinaryGameplayEffectComp_Attribute::OnActiveGameplayEffectRemoved, ASC, MoveTemp(AllBounds));
@@ -53,7 +62,7 @@ void UBinaryGameplayEffectComp_Attribute::OnAttributeChanged(const FOnAttributeC
 	bool bRemoveFlag = false;
 	for(const FBinaryAttributeCondition& Condition: RemovalAttributeConditions)
 	{
-		if(Condition.CheckCondition(AttributeChangeData))
+		if(Condition.CheckCondition(ASC, AttributeChangeData))
 		{
 			bRemoveFlag = true;
 			break;

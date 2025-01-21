@@ -10,7 +10,11 @@
 UENUM(BlueprintType)
 enum class EBinaryAttributeConditionType: uint8
 {
-	LessOrEqual,
+	Equal			UMETA(DisplayName="=="), 
+	Less			UMETA(DisplayName="<"),
+	LessOrEqual		UMETA(DisplayName="<="),
+	Greater			UMETA(DisplayName=">"),
+	GreaterOrEqual	UMETA(DisplayName=">="),
 };
 
 USTRUCT(BlueprintType)
@@ -26,6 +30,7 @@ struct FBinaryAttributeCondition
 {
 	GENERATED_BODY()
 
+public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayAttribute Attribute;
 
@@ -35,5 +40,17 @@ struct FBinaryAttributeCondition
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Value = 0.f;
 
-	bool CheckCondition(const FOnAttributeChangeData& AttributeChangeData) const;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bPercent = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(EditCondition="bPercent", EditConditionHides))
+	FGameplayAttribute BackAttribute;
+
+	bool CanRegisterCheck(const UAbilitySystemComponent* ASC) const;
+
+	bool CheckCondition(const UAbilitySystemComponent* ASC) const;
+	bool CheckCondition(const UAbilitySystemComponent* ASC, const FOnAttributeChangeData& AttributeChangeData) const;
+
+protected:
+	bool Check(const float CheckValue) const;
 };
