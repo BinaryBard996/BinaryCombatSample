@@ -28,7 +28,8 @@ public class BinaryCombat : ModuleRules
 				"Core",
 				"GameplayAbilities",
 				"GameplayTags",
-				"GameplayTasks"
+				"GameplayTasks",
+				"ModularGameplay"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Config=Game)
 class BINARYCOMBAT_API UBinaryAbilitySystemGlobals : public UAbilitySystemGlobals
 {
 	GENERATED_BODY()
