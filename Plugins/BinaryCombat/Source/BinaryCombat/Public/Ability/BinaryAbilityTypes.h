@@ -56,11 +56,11 @@ protected:
 	bool Check(const float CheckValue) const;
 };
 
-struct BINARYCOMBAT_API FBinaryAbilityAttributeAggregatorEvaluateParameter
+struct BINARYCOMBAT_API FBinaryAbilityAttributeEvaluateParameter
 {
 	FGameplayTagContainer SourceTagContainer;
+	FGameplayTagContainer TargetTagContainer;
 	FGameplayTagContainer AbilityTagContainer;
-	FGameplayTagContainer EffectTagContainer;
 
 	FGameplayAbilitySpecHandle AbilityHandle;
 };
@@ -68,8 +68,8 @@ struct BINARYCOMBAT_API FBinaryAbilityAttributeAggregatorEvaluateParameter
 struct BINARYCOMBAT_API FBinaryAbilityAttributeMod
 {
 	FGameplayTagRequirements SourceTagRequirements;
+	FGameplayTagRequirements TargetTagRequirements;
 	FGameplayTagRequirements AbilityTagRequirements;
-	FGameplayTagRequirements EffectTagRequirements;
 	FGameplayAbilitySpecHandle AbilityHandle;
 	FActiveGameplayEffectHandle ActiveEffectHandle;
 	
@@ -80,6 +80,14 @@ struct BINARYCOMBAT_API FBinaryAbilityAttributeMod
 
 struct BINARYCOMBAT_API FBinaryAbilityAttributeModContainer
 {
+public:
+	float EvaluateWithBase(float BaseValue, const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter) const;
+	
+	void AddMod(float EvaluatedMagnitude, TEnumAsByte<EGameplayModOp::Type> ModOp, const FGameplayTagRequirements* SourceTagRequirements, const FGameplayTagRequirements* TargetTagRequirements, const FGameplayTagRequirements* AbilityTagRequirements, const FGameplayAbilitySpecHandle& AbilityHandle, FActiveGameplayEffectHandle& EffectHandle);
+
+	void RemoveModsWitchActiveHandle(const FActiveGameplayEffectHandle& ActiveHandle);
+	
+private:
 	TArray<FBinaryAbilityAttributeMod> Mods;
 };
 

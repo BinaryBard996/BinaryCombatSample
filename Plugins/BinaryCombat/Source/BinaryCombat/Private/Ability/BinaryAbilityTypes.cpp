@@ -104,3 +104,20 @@ bool FBinaryAttributeCondition::Check(const float CheckValue) const
 
 	return false;
 }
+
+float FBinaryAbilityAttributeModContainer::EvaluateWithBase(float BaseValue,
+	const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter) const
+{
+	return 0.f;
+}
+
+void FBinaryAbilityAttributeModContainer::RemoveModsWitchActiveHandle(const FActiveGameplayEffectHandle& ActiveHandle)
+{
+}
+
+void FBinaryAbilityAttributeModContainer::AddMod(float EvaluatedMagnitude, TEnumAsByte<EGameplayModOp::Type> ModOp,
+                                                 const FGameplayTagRequirements* SourceTagRequirements, const FGameplayTagRequirements* TargetTagRequirements,
+                                                 const FGameplayTagRequirements* AbilityTagRequirements, const FGameplayAbilitySpecHandle& AbilityHandle,
+                                                 FActiveGameplayEffectHandle& EffectHandle)
+{
+}
