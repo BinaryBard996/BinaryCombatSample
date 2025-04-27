@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "GameplayEffectTypes.h"
 #include "BinaryAbilityTypes.generated.h"
 
@@ -26,7 +27,7 @@ struct FBinaryAbilityTaskConfig
 
 // 判断属性是否满足条件
 USTRUCT(BlueprintType)
-struct FBinaryAttributeCondition
+struct BINARYCOMBAT_API FBinaryAttributeCondition
 {
 	GENERATED_BODY()
 
@@ -54,3 +55,46 @@ public:
 protected:
 	bool Check(const float CheckValue) const;
 };
+
+struct BINARYCOMBAT_API FBinaryAbilityAttributeAggregatorEvaluateParameter
+{
+	FGameplayTagContainer SourceTagContainer;
+	FGameplayTagContainer AbilityTagContainer;
+	FGameplayTagContainer EffectTagContainer;
+
+	FGameplayAbilitySpecHandle AbilityHandle;
+};
+
+struct BINARYCOMBAT_API FBinaryAbilityAttributeMod
+{
+	FGameplayTagRequirements SourceTagRequirements;
+	FGameplayTagRequirements AbilityTagRequirements;
+	FGameplayTagRequirements EffectTagRequirements;
+	FGameplayAbilitySpecHandle AbilityHandle;
+	FActiveGameplayEffectHandle ActiveEffectHandle;
+	
+	FGameplayTag ModChannel;
+	EGameplayModOp::Type Op;
+	float EvaluateMagnitude;
+};
+
+struct BINARYCOMBAT_API FBinaryAbilityAttributeModContainer
+{
+	TArray<FBinaryAbilityAttributeMod> Mods;
+};
+
+USTRUCT()
+struct BINARYCOMBAT_API FBinaryAbilityAttributeAggregator
+{
+	GENERATED_BODY()
+
+	TArray<FBinaryAbilityAttributeModContainer> ModInfos[EGameplayModOp::Max];
+};
+
+
+
+
+
+
+
+
