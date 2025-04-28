@@ -32,3 +32,13 @@ void ABinaryCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
+UBinaryAbilitySystemComponent* ABinaryCharacter::GetBinaryAbilitySystemComponent() const
+{
+	return nullptr;
+}
+
+UAbilitySystemComponent* ABinaryCharacter::GetAbilitySystemComponent() const
+{
+	return nullptr;
+}
+

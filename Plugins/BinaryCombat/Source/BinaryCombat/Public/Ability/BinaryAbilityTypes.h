@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
 #include "GameplayAbilitySpecHandle.h"
+#include "GameplayEffect.h"
 #include "GameplayEffectTypes.h"
 #include "BinaryAbilityTypes.generated.h"
 
@@ -61,8 +62,7 @@ struct BINARYCOMBAT_API FBinaryAbilityAttributeEvaluateParameter
 	FGameplayTagContainer SourceTagContainer;
 	FGameplayTagContainer TargetTagContainer;
 	FGameplayTagContainer AbilityTagContainer;
-
-	FGameplayAbilitySpecHandle AbilityHandle;
+	FGameplayTagContainer EffectTagContainer;
 };
 
 struct BINARYCOMBAT_API FBinaryAbilityAttributeMod
@@ -70,35 +70,61 @@ struct BINARYCOMBAT_API FBinaryAbilityAttributeMod
 	FGameplayTagRequirements SourceTagRequirements;
 	FGameplayTagRequirements TargetTagRequirements;
 	FGameplayTagRequirements AbilityTagRequirements;
-	FGameplayAbilitySpecHandle AbilityHandle;
+	FGameplayTagRequirements EffectTagRequirements;
 	FActiveGameplayEffectHandle ActiveEffectHandle;
 	
-	FGameplayTag ModChannel;
-	EGameplayModOp::Type Op;
-	float EvaluateMagnitude;
-};
+	float EvaluatedMagnitude;
 
-struct BINARYCOMBAT_API FBinaryAbilityAttributeModContainer
-{
-public:
-	float EvaluateWithBase(float BaseValue, const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter) const;
-	
-	void AddMod(float EvaluatedMagnitude, TEnumAsByte<EGameplayModOp::Type> ModOp, const FGameplayTagRequirements* SourceTagRequirements, const FGameplayTagRequirements* TargetTagRequirements, const FGameplayTagRequirements* AbilityTagRequirements, const FGameplayAbilitySpecHandle& AbilityHandle, FActiveGameplayEffectHandle& EffectHandle);
-
-	void RemoveModsWitchActiveHandle(const FActiveGameplayEffectHandle& ActiveHandle);
+	bool Qualifies() const { return bQualified; }
+	void UpdateQualifies(const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter) const;
 	
 private:
-	TArray<FBinaryAbilityAttributeMod> Mods;
+	mutable bool bQualified = true;
+};
+
+struct BINARYCOMBAT_API FBinaryAbilityAttributeAggregator
+{
+
+public:
+	void AddAggregatorMod(float EvaluatedMagnitude, TEnumAsByte<EGameplayModOp::Type> ModOp, const FGameplayTagRequirements& SourceTagRequirements, const FGameplayTagRequirements& TargetTagRequirements, const FGameplayTagRequirements& AbilityTagRequirements, const FGameplayTagRequirements& EffectTagRequirements, const FActiveGameplayEffectHandle& ActiveHandle);
+	void RemoveAggregatorMod(const FActiveGameplayEffectHandle& Handle);
+	
+	float Evaluate(float InBaseValue, const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter) const;
+
+	static float SumMods(const TArray<FBinaryAbilityAttributeMod>& InMods, float Bias, const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter);
+	static float ProductMods(const TArray<FBinaryAbilityAttributeMod>& InMods, const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter);
+	static float MultiplyMods(const TArray<FBinaryAbilityAttributeMod>& InMods, const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter);
+	
+private:
+	TArray<FBinaryAbilityAttributeMod> ModInfos[EGameplayModOp::Max];
 };
 
 USTRUCT()
-struct BINARYCOMBAT_API FBinaryAbilityAttributeAggregator
+struct BINARYCOMBAT_API FBinaryAbilityAttributeModifer
 {
 	GENERATED_BODY()
 
-	TArray<FBinaryAbilityAttributeModContainer> ModInfos[EGameplayModOp::Max];
-};
+	UPROPERTY(EditDefaultsOnly, meta=(Categories="Ability.Attribute"))
+	FGameplayTag AbilityAttributeTag;
 
+	UPROPERTY(EditDefaultsOnly)
+	TEnumAsByte<EGameplayModOp::Type> ModifierOp = EGameplayModOp::AddBase;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayEffectModifierMagnitude ModifierMagnitude;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTagRequirements SourceTagRequirements;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTagRequirements TargetTagRequirements;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTagRequirements AbilityTagRequirements;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTagRequirements EffectTagRequirements;
+};
 
 
 

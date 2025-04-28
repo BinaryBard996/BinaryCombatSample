@@ -19,7 +19,7 @@ class BINARYCOMBAT_API ABinaryPlayerState
 	GENERATED_BODY()
 
 public:
-	ABinaryPlayerState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get())
+	ABinaryPlayerState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 	// IAbilitySystemInterface
 	UFUNCTION(BlueprintCallable)

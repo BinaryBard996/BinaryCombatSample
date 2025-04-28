@@ -15,7 +15,7 @@ class BINARYCOMBAT_API UBinaryPawnExtensionComponent : public UPawnComponent
 
 public:	
 	// Sets default values for this component's properties
-	UBinaryPawnExtensionComponent();
+	UBinaryPawnExtensionComponent(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	// Called when the game starts
