@@ -18,6 +18,9 @@ class BINARYCOMBAT_API UBinaryAbilitySystemComponent : public UAbilitySystemComp
 	//------------------------------------------------------
 	//                  Common Functions
 	//------------------------------------------------------
+public:
+	UFUNCTION(BlueprintCallable, Category="Ability")
+	FGameplayAbilitySpecHandle GiveAbilityWithParams(const FBinaryAbilityInitParams& AbilityInitParams);
 
 	//------------------------------------------------------
 	//                 Ability Magnitudes

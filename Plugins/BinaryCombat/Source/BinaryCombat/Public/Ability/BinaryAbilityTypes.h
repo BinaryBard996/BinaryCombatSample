@@ -9,6 +9,8 @@
 #include "GameplayEffectTypes.h"
 #include "BinaryAbilityTypes.generated.h"
 
+class UBinaryGameplayAbility;
+
 UENUM(BlueprintType)
 enum class EBinaryAttributeConditionType: uint8
 {
@@ -126,6 +128,30 @@ struct BINARYCOMBAT_API FBinaryAbilityAttributeModifer
 	FGameplayTagRequirements EffectTagRequirements;
 };
 
+USTRUCT(BlueprintType)
+struct BINARYCOMBAT_API FBinaryAbilityAttributeDefine
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag DataTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DataValue = 0.f;
+};
+
+// 临时参数，后续使用DA管理技能参数
+USTRUCT(BlueprintType)
+struct BINARYCOMBAT_API FBinaryAbilityInitParams
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UBinaryGameplayAbility> AbilityClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FBinaryAbilityAttributeDefine> AbilityAttributes;
+};
 
 
 
