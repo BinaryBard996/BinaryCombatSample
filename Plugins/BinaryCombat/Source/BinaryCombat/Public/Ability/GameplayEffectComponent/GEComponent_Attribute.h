@@ -6,7 +6,7 @@
 #include "ActiveGameplayEffectHandle.h"
 #include "GameplayEffectTypes.h"
 #include "Ability/BinaryGameplayEffectComponent.h"
-#include "BinaryGameplayEffectComp_Attribute.generated.h"
+#include "GEComponent_Attribute.generated.h"
 
 struct FBinaryAttributeCondition;
 

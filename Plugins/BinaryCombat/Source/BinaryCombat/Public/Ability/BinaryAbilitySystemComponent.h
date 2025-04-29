@@ -23,10 +23,10 @@ public:
 	FGameplayAbilitySpecHandle GiveAbilityWithParams(const FBinaryAbilityInitParams& AbilityInitParams);
 
 	//------------------------------------------------------
-	//                 Ability Magnitudes
+	//                 Ability Attribute
 	//------------------------------------------------------
 public:
-
+	//void AddActiveGameplayEffectAbilityAttributeModifiers(FActiveGameplayEffect& Effect, );
 
 protected:
 	TMap<FGameplayTag, FBinaryAbilityAttributeAggregator> CommonAbilityAttributeAggregators;

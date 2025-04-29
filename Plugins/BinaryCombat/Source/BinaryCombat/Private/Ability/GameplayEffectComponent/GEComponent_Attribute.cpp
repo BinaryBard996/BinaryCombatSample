@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Ability/GameplayEffectComponent/BinaryGameplayEffectComp_Attribute.h"
+#include "Ability/GameplayEffectComponent/GEComponent_Attribute.h"
 
 #include "AbilitySystemComponent.h"
 #include "GameplayEffect.h"
