@@ -62,7 +62,6 @@ protected:
 struct BINARYCOMBAT_API FBinaryAbilityAttributeEvaluateParameter
 {
 	FGameplayTagContainer SourceTagContainer;
-	FGameplayTagContainer TargetTagContainer;
 	FGameplayTagContainer AbilityTagContainer;
 	FGameplayTagContainer EffectTagContainer;
 };
@@ -70,7 +69,6 @@ struct BINARYCOMBAT_API FBinaryAbilityAttributeEvaluateParameter
 struct BINARYCOMBAT_API FBinaryAbilityAttributeMod
 {
 	FGameplayTagRequirements SourceTagRequirements;
-	FGameplayTagRequirements TargetTagRequirements;
 	FGameplayTagRequirements AbilityTagRequirements;
 	FGameplayTagRequirements EffectTagRequirements;
 	FActiveGameplayEffectHandle ActiveEffectHandle;
@@ -88,7 +86,7 @@ struct BINARYCOMBAT_API FBinaryAbilityAttributeAggregator
 {
 
 public:
-	void AddAggregatorMod(float EvaluatedMagnitude, TEnumAsByte<EGameplayModOp::Type> ModOp, const FGameplayTagRequirements& SourceTagRequirements, const FGameplayTagRequirements& TargetTagRequirements, const FGameplayTagRequirements& AbilityTagRequirements, const FGameplayTagRequirements& EffectTagRequirements, const FActiveGameplayEffectHandle& ActiveHandle);
+	void AddAggregatorMod(float EvaluatedMagnitude, TEnumAsByte<EGameplayModOp::Type> ModOp, const FGameplayTagRequirements& SourceTagRequirements, const FGameplayTagRequirements& AbilityTagRequirements, const FGameplayTagRequirements& EffectTagRequirements, const FActiveGameplayEffectHandle& ActiveHandle);
 	void RemoveAggregatorMod(const FActiveGameplayEffectHandle& Handle);
 	
 	float Evaluate(float InBaseValue, const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter) const;
@@ -101,7 +99,7 @@ private:
 	TArray<FBinaryAbilityAttributeMod> ModInfos[EGameplayModOp::Max];
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct BINARYCOMBAT_API FBinaryAbilityAttributeModifer
 {
 	GENERATED_BODY()
@@ -117,9 +115,6 @@ struct BINARYCOMBAT_API FBinaryAbilityAttributeModifer
 
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayTagRequirements SourceTagRequirements;
-
-	UPROPERTY(EditDefaultsOnly)
-	FGameplayTagRequirements TargetTagRequirements;
 
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayTagRequirements AbilityTagRequirements;

@@ -3,3 +3,55 @@
 
 #include "Ability/GameplayEffectComponent/GEComponent_AbilityAttribute.h"
 
+#include "BinaryCombatLog.h"
+#include "GameplayEffect.h"
+#include "Ability/BinaryAbilitySystemComponent.h"
+
+UGEComponent_AbilityAttribute::UGEComponent_AbilityAttribute()
+{
+#if WITH_EDITORONLY_DATA
+	EditorFriendlyName = TEXT("Modify Ability Attribute While Active.");
+#endif
+}
+
+bool UGEComponent_AbilityAttribute::OnActiveGameplayEffectAdded(FActiveGameplayEffectsContainer& ActiveGEContainer,
+	FActiveGameplayEffect& ActiveGE) const
+{
+	ActiveGE.EventSet.OnInhibitionChanged.AddUObject(this, &UGEComponent_AbilityAttribute::OnActiveGameplayEffectInhibitionChanged);
+	return true;
+}
+
+void UGEComponent_AbilityAttribute::OnActiveGameplayEffectInhibitionChanged(FActiveGameplayEffectHandle EffectHandle,
+	bool bIsInhibited) const
+{
+	if(!bIsInhibited)
+	{
+		AddAbilityAttributeModifiers(EffectHandle);
+	}
+	else
+	{
+		RemoveAbilityAttributeModifiers(EffectHandle);
+	}
+}
+
+void UGEComponent_AbilityAttribute::AddAbilityAttributeModifiers(FActiveGameplayEffectHandle EffectHandle) const
+{
+	UBinaryAbilitySystemComponent* AbilitySystemComponent = Cast<UBinaryAbilitySystemComponent>(EffectHandle.GetOwningAbilitySystemComponent());
+	if(!AbilitySystemComponent)
+	{
+		return;
+	}
+
+	AbilitySystemComponent->AddActiveGameplayEffectAbilityAttributeModifiers(EffectHandle, Modifiers);
+}
+
+void UGEComponent_AbilityAttribute::RemoveAbilityAttributeModifiers(FActiveGameplayEffectHandle EffectHandle) const
+{
+	UBinaryAbilitySystemComponent* AbilitySystemComponent = Cast<UBinaryAbilitySystemComponent>(EffectHandle.GetOwningAbilitySystemComponent());
+	if(!AbilitySystemComponent)
+	{
+		return;
+	}
+
+	AbilitySystemComponent->RemoveActiveGameplayEffectAbilityAttributeModifiers(EffectHandle);
+}

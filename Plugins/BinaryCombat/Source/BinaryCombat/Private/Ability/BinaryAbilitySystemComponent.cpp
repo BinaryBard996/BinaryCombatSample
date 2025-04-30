@@ -22,3 +22,102 @@ FGameplayAbilitySpecHandle UBinaryAbilitySystemComponent::GiveAbilityWithParams(
 	}
 	return GiveAbility(AbilitySpec);
 }
+
+float UBinaryAbilitySystemComponent::EvaluateAbilityAttribute(FGameplayTag AttributeTag,
+	FGameplayAbilitySpecHandle AbilityHandle)
+{
+	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(AbilityHandle);
+	if(!AbilitySpec) return 0.f;
+
+	if(AbilitySpec->Ability) return 0.f;
+	
+	FBinaryAbilityAttributeEvaluateParameter EvaluateParameter;
+	EvaluateParameter.SourceTagContainer = GetOwnedGameplayTags();
+	UBinaryGameplayAbility::GetAllAbilityAssetTags(*AbilitySpec, EvaluateParameter.AbilityTagContainer);
+
+	return InternalEvaluateAbilityAttribute(AttributeTag, AbilitySpec->SetByCallerTagMagnitudes.FindRef(AttributeTag), EvaluateParameter);
+}
+
+float UBinaryAbilitySystemComponent::EvaluateAbilityAttributeWithEffectSpec(FGameplayTag AttributeTag,
+	const FGameplayAbilitySpecHandle AbilityHandle, const FGameplayEffectSpecHandle& EffectSpecHandle)
+{
+	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(AbilityHandle);
+	if(!AbilitySpec || !AbilitySpec->Ability || !EffectSpecHandle.IsValid()) return 0.f;
+	
+	FBinaryAbilityAttributeEvaluateParameter EvaluateParameter;
+	EvaluateParameter.SourceTagContainer = GetOwnedGameplayTags();
+	UBinaryGameplayAbility::GetAllAbilityAssetTags(*AbilitySpec, EvaluateParameter.AbilityTagContainer);
+	EffectSpecHandle.Data->GetAllAssetTags(EvaluateParameter.EffectTagContainer);
+
+	return InternalEvaluateAbilityAttribute(AttributeTag, AbilitySpec->SetByCallerTagMagnitudes.FindRef(AttributeTag), EvaluateParameter);
+}
+
+float UBinaryAbilitySystemComponent::InternalEvaluateAbilityAttribute(
+	const FGameplayTag& AttributeTag, const float BaseValue, 
+	const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter)
+{
+	float EvaluatedMagnitude = BaseValue;
+	
+	if(const FBinaryAbilityAttributeAggregator* Aggregator = AbilityAttributeAggregators.Find(AttributeTag))
+	{
+		EvaluatedMagnitude = Aggregator->Evaluate(EvaluatedMagnitude, EvaluateParameter);
+	}
+
+	return EvaluatedMagnitude;
+}
+
+void UBinaryAbilitySystemComponent::AddActiveGameplayEffectAbilityAttributeModifiers(
+	const FActiveGameplayEffectHandle& EffectHandle, const TArray<FBinaryAbilityAttributeModifer>& Modifiers)
+{
+	if(!EffectHandle.IsValid())
+	{
+		return;
+	}
+
+	const FActiveGameplayEffect* Effect = GetActiveGameplayEffect(EffectHandle);
+	if(!Effect)
+	{
+		return;
+	}
+	
+	for(const FBinaryAbilityAttributeModifer& Modifier: Modifiers)
+	{
+		if(!Modifier.AbilityAttributeTag.IsValid())
+		{
+			continue;
+		}
+
+		float EvaluateMagnitude = 0.f;
+		Modifier.ModifierMagnitude.AttemptCalculateMagnitude(Effect->Spec, EvaluateMagnitude);
+		AbilityAttributeAggregators.FindOrAdd(Modifier.AbilityAttributeTag).
+			AddAggregatorMod(EvaluateMagnitude, Modifier.ModifierOp, Modifier.SourceTagRequirements, Modifier.AbilityTagRequirements, Modifier.EffectTagRequirements, EffectHandle);
+	}
+}
+
+void UBinaryAbilitySystemComponent::RemoveActiveGameplayEffectAbilityAttributeModifiers(
+	const FActiveGameplayEffectHandle& EffectHandle)
+{
+	if(!EffectHandle.IsValid())
+	{
+		return;
+	}
+	
+	for(auto& Pair: AbilityAttributeAggregators)
+	{
+		Pair.Value.RemoveAggregatorMod(EffectHandle);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

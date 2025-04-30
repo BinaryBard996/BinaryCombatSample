@@ -110,17 +110,15 @@ void FBinaryAbilityAttributeMod::UpdateQualifies(
 	const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter) const
 {
 	bool bSourceMet = SourceTagRequirements.IsEmpty() || SourceTagRequirements.RequirementsMet(EvaluateParameter.SourceTagContainer);
-	bool bTargetMet = TargetTagRequirements.IsEmpty() || TargetTagRequirements.RequirementsMet(EvaluateParameter.TargetTagContainer);
 	bool bAbilityMet = AbilityTagRequirements.IsEmpty() || AbilityTagRequirements.RequirementsMet(EvaluateParameter.AbilityTagContainer);
 	bool bEffectMet = EffectTagRequirements.IsEmpty() || EffectTagRequirements.RequirementsMet(EvaluateParameter.EffectTagContainer);
 
-	bQualified = bSourceMet && bTargetMet && bAbilityMet && bEffectMet;
+	bQualified = bSourceMet && bAbilityMet && bEffectMet;
 }
 
 void FBinaryAbilityAttributeAggregator::AddAggregatorMod(float EvaluatedMagnitude, TEnumAsByte<EGameplayModOp::Type> ModOp,
-                                               const FGameplayTagRequirements& SourceTagRequirements, const FGameplayTagRequirements& TargetTagRequirements,
-                                               const FGameplayTagRequirements& AbilityTagRequirements, const FGameplayTagRequirements& EffectTagRequirements,
-                                               const FActiveGameplayEffectHandle& ActiveHandle)
+                                               const FGameplayTagRequirements& SourceTagRequirements, const FGameplayTagRequirements& AbilityTagRequirements,
+                                               const FGameplayTagRequirements& EffectTagRequirements, const FActiveGameplayEffectHandle& ActiveHandle)
 {
 	TArray<FBinaryAbilityAttributeMod>& ModList = ModInfos[ModOp];
 
@@ -128,7 +126,6 @@ void FBinaryAbilityAttributeAggregator::AddAggregatorMod(float EvaluatedMagnitud
 	FBinaryAbilityAttributeMod& NewMod = ModList[NewIndex];
 
 	NewMod.SourceTagRequirements = SourceTagRequirements;
-	NewMod.TargetTagRequirements = TargetTagRequirements;
 	NewMod.AbilityTagRequirements = AbilityTagRequirements;
 	NewMod.EffectTagRequirements = EffectTagRequirements;
 	NewMod.ActiveEffectHandle = ActiveHandle;

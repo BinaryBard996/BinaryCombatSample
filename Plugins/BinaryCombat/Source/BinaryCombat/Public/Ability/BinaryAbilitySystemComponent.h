@@ -26,10 +26,19 @@ public:
 	//                 Ability Attribute
 	//------------------------------------------------------
 public:
-	//void AddActiveGameplayEffectAbilityAttributeModifiers(FActiveGameplayEffect& Effect, );
+	UFUNCTION(BlueprintPure, Category="Ability Attribute")
+	float EvaluateAbilityAttribute(FGameplayTag AttributeTag, FGameplayAbilitySpecHandle AbilityHandle);
+
+	UFUNCTION(BlueprintPure, Category="Ability Attribute")
+	float EvaluateAbilityAttributeWithEffectSpec(FGameplayTag AttributeTag, const FGameplayAbilitySpecHandle AbilityHandle, const FGameplayEffectSpecHandle& EffectSpecHandle);
+	
+	float InternalEvaluateAbilityAttribute(const FGameplayTag& AttributeTag, const float BaseValue, const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter);
+	
+	void AddActiveGameplayEffectAbilityAttributeModifiers(const FActiveGameplayEffectHandle& EffectHandle, const TArray<FBinaryAbilityAttributeModifer>& Modifiers);
+	void RemoveActiveGameplayEffectAbilityAttributeModifiers(const FActiveGameplayEffectHandle& EffectHandle);
 
 protected:
-	TMap<FGameplayTag, FBinaryAbilityAttributeAggregator> CommonAbilityAttributeAggregators;
+	TMap<FGameplayTag, FBinaryAbilityAttributeAggregator> AbilityAttributeAggregators;
 
 	//------------------------------------------------------
 };

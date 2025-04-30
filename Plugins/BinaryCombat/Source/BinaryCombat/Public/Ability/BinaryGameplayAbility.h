@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "Abilities/GameplayAbility.h"
 #include "BinaryGameplayAbility.generated.h"
 
@@ -10,8 +11,17 @@
  * 
  */
 UCLASS()
-class BINARYCOMBAT_API UBinaryGameplayAbility : public UGameplayAbility
+class BINARYCOMBAT_API UBinaryGameplayAbility : public UGameplayAbility, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
+
+public:
+	// ~IGameplayTagAssetInterface START
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
+	// IGameplayTagAssetInterface END
+
+public:
+
+	static void GetAllAbilityAssetTags(const FGameplayAbilitySpec& AbilitySpec, FGameplayTagContainer& OutTagContainer);
 	
 };
