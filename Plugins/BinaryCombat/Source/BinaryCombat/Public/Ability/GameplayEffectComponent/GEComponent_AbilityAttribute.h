@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "Ability/BinaryGameplayEffectComponent.h"
 #include "GEComponent_AbilityAttribute.generated.h"
 
@@ -14,17 +15,18 @@ struct FBinaryAbilityAttributeModifer;
  * 
  */
 UCLASS()
-class BINARYCOMBAT_API UGEComponent_AbilityAttribute : public UBinaryGameplayEffectComponent
+class BINARYCOMBAT_API UBinaryGameplayEffectComp_AbilityAttribute : public UBinaryGameplayEffectComponent
 {
 	GENERATED_BODY()
 
 public:
-	UGEComponent_AbilityAttribute();
+	UBinaryGameplayEffectComp_AbilityAttribute();
 
 	virtual bool OnActiveGameplayEffectAdded(FActiveGameplayEffectsContainer& ActiveGEContainer, FActiveGameplayEffect& ActiveGE) const override;
 
 protected:
 	void OnActiveGameplayEffectInhibitionChanged(FActiveGameplayEffectHandle EffectHandle, bool bIsInhibited) const;
+	void OnActiveGameplayEffectRemoved(const FGameplayEffectRemovalInfo& RemovalInfo) const;
 
 	void AddAbilityAttributeModifiers(FActiveGameplayEffectHandle EffectHandle) const;
 	void RemoveAbilityAttributeModifiers(FActiveGameplayEffectHandle EffectHandle) const;

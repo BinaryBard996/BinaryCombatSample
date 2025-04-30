@@ -17,11 +17,10 @@ class BINARYCOMBAT_API UBinaryGameplayAbility : public UGameplayAbility, public 
 
 public:
 	// ~IGameplayTagAssetInterface START
-	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& OutTagContainer) const override;
 	// IGameplayTagAssetInterface END
 
 public:
-
 	static void GetAllAbilityAssetTags(const FGameplayAbilitySpec& AbilitySpec, FGameplayTagContainer& OutTagContainer);
-	
+
 };

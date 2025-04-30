@@ -106,19 +106,24 @@ bool FBinaryAttributeCondition::Check(const float CheckValue) const
 	return false;
 }
 
+FBinaryAbilityAttributeMod::FBinaryAbilityAttributeMod()
+{
+	
+}
+
 void FBinaryAbilityAttributeMod::UpdateQualifies(
 	const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter) const
 {
-	bool bSourceMet = SourceTagRequirements.IsEmpty() || SourceTagRequirements.RequirementsMet(EvaluateParameter.SourceTagContainer);
-	bool bAbilityMet = AbilityTagRequirements.IsEmpty() || AbilityTagRequirements.RequirementsMet(EvaluateParameter.AbilityTagContainer);
-	bool bEffectMet = EffectTagRequirements.IsEmpty() || EffectTagRequirements.RequirementsMet(EvaluateParameter.EffectTagContainer);
+	bool bSourceMet = (SourceTagRequirements && !SourceTagRequirements->IsEmpty()) ? SourceTagRequirements->RequirementsMet(EvaluateParameter.SourceTagContainer) : true;
+	bool bAbilityMet = (AbilityTagRequirements && !AbilityTagRequirements->IsEmpty()) ? AbilityTagRequirements->RequirementsMet(EvaluateParameter.AbilityTagContainer) : true;
+	bool bEffectMet = (EffectTagRequirements && !EffectTagRequirements->IsEmpty()) ? EffectTagRequirements->RequirementsMet(EvaluateParameter.EffectTagContainer): true;
 
 	bQualified = bSourceMet && bAbilityMet && bEffectMet;
 }
 
 void FBinaryAbilityAttributeAggregator::AddAggregatorMod(float EvaluatedMagnitude, TEnumAsByte<EGameplayModOp::Type> ModOp,
-                                               const FGameplayTagRequirements& SourceTagRequirements, const FGameplayTagRequirements& AbilityTagRequirements,
-                                               const FGameplayTagRequirements& EffectTagRequirements, const FActiveGameplayEffectHandle& ActiveHandle)
+                                               const FGameplayTagRequirements* SourceTagRequirements, const FGameplayTagRequirements* AbilityTagRequirements,
+                                               const FGameplayTagRequirements* EffectTagRequirements, const FActiveGameplayEffectHandle& ActiveHandle)
 {
 	TArray<FBinaryAbilityAttributeMod>& ModList = ModInfos[ModOp];
 
@@ -147,7 +152,7 @@ void FBinaryAbilityAttributeAggregator::RemoveAggregatorMod(const FActiveGamepla
 float FBinaryAbilityAttributeAggregator::Evaluate(float InBaseValue,
                                                           const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter) const
 {
-	
+	EvaluateQualificationForAllMods(EvaluateParameter);
 	
 	for(const auto& Mod: ModInfos[EGameplayModOp::Override])
 	{
@@ -172,8 +177,20 @@ float FBinaryAbilityAttributeAggregator::Evaluate(float InBaseValue,
 	return ((InBaseValue + AddBase) * MultiplyAdditive / DivideAdditive) * MultiplyCompound + AddFinal;
 }
 
+void FBinaryAbilityAttributeAggregator::EvaluateQualificationForAllMods(
+	const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter) const
+{
+	for(const TArray<FBinaryAbilityAttributeMod>& Mods: ModInfos)
+	{
+		for(const FBinaryAbilityAttributeMod& Mod: Mods)
+		{
+			Mod.UpdateQualifies(EvaluateParameter);
+		}
+	}
+}
+
 float FBinaryAbilityAttributeAggregator::SumMods(const TArray<FBinaryAbilityAttributeMod>& InMods, float Bias,
-	const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter)
+                                                 const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter)
 {
 	float Sum = Bias;
 

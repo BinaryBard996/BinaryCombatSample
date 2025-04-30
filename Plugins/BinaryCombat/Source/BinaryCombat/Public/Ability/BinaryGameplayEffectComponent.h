@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class BINARYCOMBAT_API UBinaryGameplayEffectComponent : public UGameplayEffectComponent
 {
 	GENERATED_BODY()

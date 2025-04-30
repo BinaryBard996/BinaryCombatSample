@@ -7,21 +7,22 @@
 #include "GameplayEffect.h"
 #include "Ability/BinaryAbilitySystemComponent.h"
 
-UGEComponent_AbilityAttribute::UGEComponent_AbilityAttribute()
+UBinaryGameplayEffectComp_AbilityAttribute::UBinaryGameplayEffectComp_AbilityAttribute()
 {
 #if WITH_EDITORONLY_DATA
 	EditorFriendlyName = TEXT("Modify Ability Attribute While Active.");
 #endif
 }
 
-bool UGEComponent_AbilityAttribute::OnActiveGameplayEffectAdded(FActiveGameplayEffectsContainer& ActiveGEContainer,
+bool UBinaryGameplayEffectComp_AbilityAttribute::OnActiveGameplayEffectAdded(FActiveGameplayEffectsContainer& ActiveGEContainer,
 	FActiveGameplayEffect& ActiveGE) const
 {
-	ActiveGE.EventSet.OnInhibitionChanged.AddUObject(this, &UGEComponent_AbilityAttribute::OnActiveGameplayEffectInhibitionChanged);
+	ActiveGE.EventSet.OnInhibitionChanged.AddUObject(this, &UBinaryGameplayEffectComp_AbilityAttribute::OnActiveGameplayEffectInhibitionChanged);
+	ActiveGE.EventSet.OnEffectRemoved.AddUObject(this, &UBinaryGameplayEffectComp_AbilityAttribute::OnActiveGameplayEffectRemoved);
 	return true;
 }
 
-void UGEComponent_AbilityAttribute::OnActiveGameplayEffectInhibitionChanged(FActiveGameplayEffectHandle EffectHandle,
+void UBinaryGameplayEffectComp_AbilityAttribute::OnActiveGameplayEffectInhibitionChanged(FActiveGameplayEffectHandle EffectHandle,
 	bool bIsInhibited) const
 {
 	if(!bIsInhibited)
@@ -34,7 +35,17 @@ void UGEComponent_AbilityAttribute::OnActiveGameplayEffectInhibitionChanged(FAct
 	}
 }
 
-void UGEComponent_AbilityAttribute::AddAbilityAttributeModifiers(FActiveGameplayEffectHandle EffectHandle) const
+void UBinaryGameplayEffectComp_AbilityAttribute::OnActiveGameplayEffectRemoved(const FGameplayEffectRemovalInfo& RemovalInfo) const
+{
+	if(!RemovalInfo.ActiveEffect)
+	{
+		return;
+	}
+	
+	RemoveAbilityAttributeModifiers(RemovalInfo.ActiveEffect->Handle);
+}
+
+void UBinaryGameplayEffectComp_AbilityAttribute::AddAbilityAttributeModifiers(FActiveGameplayEffectHandle EffectHandle) const
 {
 	UBinaryAbilitySystemComponent* AbilitySystemComponent = Cast<UBinaryAbilitySystemComponent>(EffectHandle.GetOwningAbilitySystemComponent());
 	if(!AbilitySystemComponent)
@@ -45,7 +56,7 @@ void UGEComponent_AbilityAttribute::AddAbilityAttributeModifiers(FActiveGameplay
 	AbilitySystemComponent->AddActiveGameplayEffectAbilityAttributeModifiers(EffectHandle, Modifiers);
 }
 
-void UGEComponent_AbilityAttribute::RemoveAbilityAttributeModifiers(FActiveGameplayEffectHandle EffectHandle) const
+void UBinaryGameplayEffectComp_AbilityAttribute::RemoveAbilityAttributeModifiers(FActiveGameplayEffectHandle EffectHandle) const
 {
 	UBinaryAbilitySystemComponent* AbilitySystemComponent = Cast<UBinaryAbilitySystemComponent>(EffectHandle.GetOwningAbilitySystemComponent());
 	if(!AbilitySystemComponent)

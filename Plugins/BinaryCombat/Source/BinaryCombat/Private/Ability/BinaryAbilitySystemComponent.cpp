@@ -27,27 +27,47 @@ float UBinaryAbilitySystemComponent::EvaluateAbilityAttribute(FGameplayTag Attri
 	FGameplayAbilitySpecHandle AbilityHandle)
 {
 	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(AbilityHandle);
-	if(!AbilitySpec) return 0.f;
+	if(!AbilitySpec)
+	{
+		UE_LOG(LogBinaryAbilitySystem, Error, TEXT("UBinaryAbilitySystemComponent::EvaluateAbilityAttribute-Input ability handle is not valid! AbilityHandle: %s"), *AbilityHandle.ToString())
+		return 0.f;
+	}
 
-	if(AbilitySpec->Ability) return 0.f;
-	
-	FBinaryAbilityAttributeEvaluateParameter EvaluateParameter;
-	EvaluateParameter.SourceTagContainer = GetOwnedGameplayTags();
-	UBinaryGameplayAbility::GetAllAbilityAssetTags(*AbilitySpec, EvaluateParameter.AbilityTagContainer);
-
-	return InternalEvaluateAbilityAttribute(AttributeTag, AbilitySpec->SetByCallerTagMagnitudes.FindRef(AttributeTag), EvaluateParameter);
+	return InternalEvaluateAbilityAttribute(AttributeTag, AbilitySpec, nullptr);
 }
 
 float UBinaryAbilitySystemComponent::EvaluateAbilityAttributeWithEffectSpec(FGameplayTag AttributeTag,
 	const FGameplayAbilitySpecHandle AbilityHandle, const FGameplayEffectSpecHandle& EffectSpecHandle)
 {
 	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(AbilityHandle);
-	if(!AbilitySpec || !AbilitySpec->Ability || !EffectSpecHandle.IsValid()) return 0.f;
+	if(!AbilitySpec)
+	{
+		UE_LOG(LogBinaryAbilitySystem, Error, TEXT("UBinaryAbilitySystemComponent::EvaluateAbilityAttribute-Input ability handle is not valid! AbilityHandle: %s"), *AbilityHandle.ToString())
+		return 0.f;
+	}
+
+	if(!EffectSpecHandle.IsValid())
+	{
+		UE_LOG(LogBinaryAbilitySystem, Error, TEXT("UBinaryAbilitySystemComponent::EvaluateAbilityAttribute-Input effect handle is not valid! Ability: %s"), *AbilitySpec->Ability.GetName())
+		return 0.f;
+	}
 	
+	return InternalEvaluateAbilityAttribute(AttributeTag, AbilitySpec, EffectSpecHandle.Data.Get());
+}
+
+float UBinaryAbilitySystemComponent::InternalEvaluateAbilityAttribute(FGameplayTag AttributeTag,
+	const FGameplayAbilitySpec* AbilitySpec, const FGameplayEffectSpec* EffectSpec)
+{
 	FBinaryAbilityAttributeEvaluateParameter EvaluateParameter;
 	EvaluateParameter.SourceTagContainer = GetOwnedGameplayTags();
-	UBinaryGameplayAbility::GetAllAbilityAssetTags(*AbilitySpec, EvaluateParameter.AbilityTagContainer);
-	EffectSpecHandle.Data->GetAllAssetTags(EvaluateParameter.EffectTagContainer);
+	if(AbilitySpec)
+	{
+		UBinaryGameplayAbility::GetAllAbilityAssetTags(*AbilitySpec, EvaluateParameter.AbilityTagContainer);
+	}
+	if(EffectSpec)
+	{
+		EffectSpec->GetAllAssetTags(EvaluateParameter.EffectTagContainer);
+	}
 
 	return InternalEvaluateAbilityAttribute(AttributeTag, AbilitySpec->SetByCallerTagMagnitudes.FindRef(AttributeTag), EvaluateParameter);
 }
@@ -90,7 +110,7 @@ void UBinaryAbilitySystemComponent::AddActiveGameplayEffectAbilityAttributeModif
 		float EvaluateMagnitude = 0.f;
 		Modifier.ModifierMagnitude.AttemptCalculateMagnitude(Effect->Spec, EvaluateMagnitude);
 		AbilityAttributeAggregators.FindOrAdd(Modifier.AbilityAttributeTag).
-			AddAggregatorMod(EvaluateMagnitude, Modifier.ModifierOp, Modifier.SourceTagRequirements, Modifier.AbilityTagRequirements, Modifier.EffectTagRequirements, EffectHandle);
+			AddAggregatorMod(EvaluateMagnitude, Modifier.ModifierOp, &Modifier.SourceTagRequirements, &Modifier.AbilityTagRequirements, &Modifier.EffectTagRequirements, EffectHandle);
 	}
 }
 

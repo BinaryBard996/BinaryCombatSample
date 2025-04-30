@@ -3,15 +3,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "GameplayEffectTypes.h"
 #include "BinaryGameplayEffectContext.generated.h"
 
 /**
  * 
  */
-UCLASS()
-class BINARYCOMBAT_API UBinaryGameplayEffectContext : public UObject
+USTRUCT()
+struct FBinaryGameplayEffectContext: public FGameplayEffectContext
 {
 	GENERATED_BODY()
-	
+
+	FBinaryGameplayEffectContext(): FGameplayEffectContext(){}
+	FBinaryGameplayEffectContext(AActor* InInstigator, AActor* InEffectCauser): FGameplayEffectContext(InInstigator, InEffectCauser){}
+
+	static BINARYCOMBAT_API FBinaryGameplayEffectContext* ExtractEffectContext(struct FGameplayEffectContextHandle Handle);
+
+	virtual UScriptStruct* GetScriptStruct() const override
+	{
+		return FBinaryGameplayEffectContext::StaticStruct();
+	};
 };

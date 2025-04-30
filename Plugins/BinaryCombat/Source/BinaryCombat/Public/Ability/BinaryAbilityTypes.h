@@ -68,13 +68,14 @@ struct BINARYCOMBAT_API FBinaryAbilityAttributeEvaluateParameter
 
 struct BINARYCOMBAT_API FBinaryAbilityAttributeMod
 {
-	FGameplayTagRequirements SourceTagRequirements;
-	FGameplayTagRequirements AbilityTagRequirements;
-	FGameplayTagRequirements EffectTagRequirements;
+	const FGameplayTagRequirements* SourceTagRequirements;
+	const FGameplayTagRequirements* AbilityTagRequirements;
+	const FGameplayTagRequirements* EffectTagRequirements;
 	FActiveGameplayEffectHandle ActiveEffectHandle;
 	
 	float EvaluatedMagnitude;
 
+	FBinaryAbilityAttributeMod();
 	bool Qualifies() const { return bQualified; }
 	void UpdateQualifies(const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter) const;
 	
@@ -86,11 +87,12 @@ struct BINARYCOMBAT_API FBinaryAbilityAttributeAggregator
 {
 
 public:
-	void AddAggregatorMod(float EvaluatedMagnitude, TEnumAsByte<EGameplayModOp::Type> ModOp, const FGameplayTagRequirements& SourceTagRequirements, const FGameplayTagRequirements& AbilityTagRequirements, const FGameplayTagRequirements& EffectTagRequirements, const FActiveGameplayEffectHandle& ActiveHandle);
+	void AddAggregatorMod(float EvaluatedMagnitude, TEnumAsByte<EGameplayModOp::Type> ModOp, const FGameplayTagRequirements* SourceTagRequirements, const FGameplayTagRequirements* AbilityTagRequirements, const FGameplayTagRequirements* EffectTagRequirements, const FActiveGameplayEffectHandle& ActiveHandle);
 	void RemoveAggregatorMod(const FActiveGameplayEffectHandle& Handle);
 	
 	float Evaluate(float InBaseValue, const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter) const;
-
+	void EvaluateQualificationForAllMods(const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter) const;
+	
 	static float SumMods(const TArray<FBinaryAbilityAttributeMod>& InMods, float Bias, const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter);
 	static float ProductMods(const TArray<FBinaryAbilityAttributeMod>& InMods, const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter);
 	static float MultiplyMods(const TArray<FBinaryAbilityAttributeMod>& InMods, const FBinaryAbilityAttributeEvaluateParameter& EvaluateParameter);
@@ -128,14 +130,14 @@ struct BINARYCOMBAT_API FBinaryAbilityAttributeDefine
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Categories="Ability.Attribute"))
 	FGameplayTag DataTag;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DataValue = 0.f;
 };
 
-// 临时参数，后续使用DA管理技能参数
+// 临时参数，后续使用DT管理技能参数
 USTRUCT(BlueprintType)
 struct BINARYCOMBAT_API FBinaryAbilityInitParams
 {

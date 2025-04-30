@@ -3,3 +3,9 @@
 
 #include "Ability/BinaryAbilitySystemGlobals.h"
 
+#include "Ability/BinaryGameplayEffectContext.h"
+
+FGameplayEffectContext* UBinaryAbilitySystemGlobals::AllocGameplayEffectContext() const
+{
+	return new FBinaryGameplayEffectContext();
+}

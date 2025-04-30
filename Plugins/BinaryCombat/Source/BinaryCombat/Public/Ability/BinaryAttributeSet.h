@@ -15,7 +15,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class BINARYCOMBAT_API UBinaryAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()

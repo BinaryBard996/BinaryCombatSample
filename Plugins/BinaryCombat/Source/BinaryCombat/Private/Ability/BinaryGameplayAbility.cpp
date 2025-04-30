@@ -3,9 +3,9 @@
 
 #include "Ability/BinaryGameplayAbility.h"
 
-void UBinaryGameplayAbility::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
+void UBinaryGameplayAbility::GetOwnedGameplayTags(FGameplayTagContainer& OutTagContainer) const
 {
-	TagContainer.AppendTags(TagContainer);
+	OutTagContainer.AppendTags(GetAssetTags());
 }
 
 void UBinaryGameplayAbility::GetAllAbilityAssetTags(const FGameplayAbilitySpec& AbilitySpec,
