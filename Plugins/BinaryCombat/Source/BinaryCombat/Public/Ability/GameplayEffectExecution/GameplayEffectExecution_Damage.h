@@ -14,6 +14,7 @@ class BINARYCOMBAT_API UGameplayEffectExecution_Damage : public UGameplayEffectE
 {
 	GENERATED_BODY()
 
+	UGameplayEffectExecution_Damage();
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
 	
 };

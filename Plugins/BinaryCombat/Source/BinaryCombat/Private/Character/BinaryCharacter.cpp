@@ -3,6 +3,8 @@
 
 #include "Character/BinaryCharacter.h"
 
+#include "Ability/BinaryAbilitySystemComponent.h"
+
 // Sets default values
 ABinaryCharacter::ABinaryCharacter()
 {
@@ -34,11 +36,11 @@ void ABinaryCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 UBinaryAbilitySystemComponent* ABinaryCharacter::GetBinaryAbilitySystemComponent() const
 {
-	return nullptr;
+	return FindComponentByClass<UBinaryAbilitySystemComponent>();
 }
 
 UAbilitySystemComponent* ABinaryCharacter::GetAbilitySystemComponent() const
 {
-	return nullptr;
+	return FindComponentByClass<UBinaryAbilitySystemComponent>();
 }
 

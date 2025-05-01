@@ -28,6 +28,11 @@ static FDamageStatics& DamageStatics()
 	return Statics;
 }
 
+UGameplayEffectExecution_Damage::UGameplayEffectExecution_Damage()
+{
+	RelevantAttributesToCapture.Add(DamageStatics().BaseDamageDef);
+}
+
 void UGameplayEffectExecution_Damage::Execute_Implementation(
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
