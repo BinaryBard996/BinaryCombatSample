@@ -150,6 +150,26 @@ struct BINARYCOMBAT_API FBinaryAbilityInitParams
 	TArray<FBinaryAbilityAttributeDefine> AbilityAttributes;
 };
 
+// 技能属性
+USTRUCT(BlueprintType)
+struct BINARYCOMBAT_API FBinaryAbilityDataLevel
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float AbilityDamageRate = 1.f;
+	
+};
+
+// 定义技能的属性
+USTRUCT(BlueprintType)
+struct BINARYCOMBAT_API FBinaryAbilityData: public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FBinaryAbilityDataLevel> DataByLevel;
+};
 
 
 

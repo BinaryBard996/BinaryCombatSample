@@ -23,4 +23,7 @@ public:
 public:
 	static void GetAllAbilityAssetTags(const FGameplayAbilitySpec& AbilitySpec, FGameplayTagContainer& OutTagContainer);
 
+protected:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Ability")
+	FName AbilityID;
 };
