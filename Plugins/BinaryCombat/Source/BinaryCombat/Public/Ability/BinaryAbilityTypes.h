@@ -7,6 +7,7 @@
 #include "GameplayAbilitySpecHandle.h"
 #include "GameplayEffect.h"
 #include "GameplayEffectTypes.h"
+#include "StructUtils/InstancedStruct.h"
 #include "BinaryAbilityTypes.generated.h"
 
 class UBinaryGameplayAbility;
@@ -150,9 +151,23 @@ struct BINARYCOMBAT_API FBinaryAbilityInitParams
 	TArray<FBinaryAbilityAttributeDefine> AbilityAttributes;
 };
 
+USTRUCT()
+struct BINARYCOMBAT_API FBinaryAbilityFragment
+{
+	GENERATED_BODY()
+	
+};
+
+USTRUCT(BlueprintType)
+struct BINARYCOMBAT_API FBinaryAbilityFragment_Test: public FBinaryAbilityFragment
+{
+	GENERATED_BODY()
+	
+};
+
 // 技能属性
 USTRUCT(BlueprintType)
-struct BINARYCOMBAT_API FBinaryAbilityDataLevel
+struct BINARYCOMBAT_API FBinaryAbilityLevelData
 {
 	GENERATED_BODY()
 
@@ -163,12 +178,15 @@ struct BINARYCOMBAT_API FBinaryAbilityDataLevel
 
 // 定义技能的属性
 USTRUCT(BlueprintType)
-struct BINARYCOMBAT_API FBinaryAbilityData: public FTableRowBase
+struct BINARYCOMBAT_API FBinaryAbilityDataRow: public FTableRowBase
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(BaseStruct="/Script/BinaryCombat.BinaryAbilityFragment", ExcludeBaseStruct))
+	TArray<FInstancedStruct> Fragments;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<FBinaryAbilityDataLevel> DataByLevel;
+	TArray<FBinaryAbilityLevelData> LevelData;
 };
 
 

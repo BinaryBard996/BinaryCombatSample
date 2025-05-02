@@ -6,6 +6,7 @@
 #include "AbilitySystemGlobals.h"
 #include "BinaryAbilitySystemGlobals.generated.h"
 
+struct FBinaryAbilityDataRow;
 /**
  * 
  */
@@ -15,7 +16,19 @@ class BINARYCOMBAT_API UBinaryAbilitySystemGlobals : public UAbilitySystemGlobal
 	GENERATED_BODY()
 
 public:
+	static UBinaryAbilitySystemGlobals& Get()
+	{
+		return *Cast<UBinaryAbilitySystemGlobals>(IGameplayAbilitiesModule::Get().GetAbilitySystemGlobals());	
+	};
 	
-	FGameplayEffectContext* AllocGameplayEffectContext() const override;
+	virtual FGameplayEffectContext* AllocGameplayEffectContext() const override;
+
+	virtual void InitGlobalData() override;
 	
+	UDataTable* GetAbilityDataTable();
+	FBinaryAbilityDataRow FindAbilityDataFromDataTable(FName RowName);
+
+protected:
+	UPROPERTY()
+	TObjectPtr<UDataTable> AbilityDataTable;
 };

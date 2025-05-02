@@ -20,8 +20,12 @@ public:
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& OutTagContainer) const override;
 	// IGameplayTagAssetInterface END
 
-public:
 	static void GetAllAbilityAssetTags(const FGameplayAbilitySpec& AbilitySpec, FGameplayTagContainer& OutTagContainer);
+
+protected:
+	// ~GameplayAbility START
+	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
+	// GameplayAbility END
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Ability")
