@@ -9,8 +9,8 @@
 /**
  * 
  */
-UCLASS(Config=Game, DefaultConfig, meta=(DisplayName="Binary Gameplay Abilities Settings"))
-class BINARYCOMBAT_API UBinaryAbilityDeveloperSettings : public UDeveloperSettings
+UCLASS(config = Game, defaultconfig, meta = (DisplayName = "Binary Gameplay Abilities Settings"), MinimalAPI)
+class UBinaryAbilityDeveloperSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 

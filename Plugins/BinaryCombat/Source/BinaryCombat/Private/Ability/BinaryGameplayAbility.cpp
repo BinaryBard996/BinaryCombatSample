@@ -4,7 +4,10 @@
 #include "Ability/BinaryGameplayAbility.h"
 
 #include "AbilitySystemGlobals.h"
+#include "BinaryCombatLog.h"
+#include "BinaryCombatTags.h"
 #include "Ability/BinaryAbilitySystemGlobals.h"
+#include "Ability/BinaryAbilityTypes.h"
 
 void UBinaryGameplayAbility::GetOwnedGameplayTags(FGameplayTagContainer& OutTagContainer) const
 {
@@ -15,7 +18,7 @@ void UBinaryGameplayAbility::GetAllAbilityAssetTags(const FGameplayAbilitySpec& 
                                                     FGameplayTagContainer& OutTagContainer)
 {
 	OutTagContainer = AbilitySpec.GetDynamicSpecSourceTags();
-	if(IGameplayTagAssetInterface* TagAssetInterface = Cast<IGameplayTagAssetInterface>(AbilitySpec.Ability))
+	if(const IGameplayTagAssetInterface* TagAssetInterface = Cast<IGameplayTagAssetInterface>(AbilitySpec.Ability))
 	{
 		TagAssetInterface->GetOwnedGameplayTags(OutTagContainer);
 	}
@@ -25,6 +28,32 @@ void UBinaryGameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* Acto
 {
 	Super::OnGiveAbility(ActorInfo, Spec);
 
+	InitGameplayAbilityData(ActorInfo, Spec);
+}
+
+void UBinaryGameplayAbility::InitGameplayAbilityData(const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec)
+{
 	UBinaryAbilitySystemGlobals& AbilitySystemGlobals = UBinaryAbilitySystemGlobals::Get();
-	AbilitySystemGlobals.GetAbilityDataTable()->FindRow<>()
+	const UDataTable* DataTable = AbilitySystemGlobals.GetAbilityDataTable();
+	if(!DataTable)
+	{
+		return;
+	}
+
+	FBinaryAbilityDataRow* Data = DataTable->FindRow<FBinaryAbilityDataRow>(AbilityID, "", false);
+	if(!Data)
+	{
+		return;
+	}
+
+	const int32 AbilityLevel = GetAbilityLevel();
+	if(!Data->LevelData.IsValidIndex(AbilityLevel))
+	{
+		UE_LOG(LogBinaryAbilitySystem, Error, TEXT("Novalid ability level data for ability: %s, ability id: %s."), *GetClass()->GetName(), *AbilityID.ToString());
+		return;
+	}
+
+	const float AbilityDamageRate = Data->LevelData[AbilityLevel].AbilityDamageRate;
+	GetCurrentAbilitySpec()->SetByCallerTagMagnitudes.Add(BinaryCombatTags::Ability_Attribute_DamageRate, AbilityDamageRate);
 }

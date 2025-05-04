@@ -30,7 +30,7 @@ public class BinaryCombat : ModuleRules
 				"GameplayTags",
 				"GameplayTasks",
 				"ModularGameplay",
-				"DeveloperSettings"
+				"DeveloperSettings",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
