@@ -26,11 +26,11 @@ public class BinaryCombat : ModuleRules
 			new string[]
 			{
 				"Core",
-				"GameplayAbilities",
 				"GameplayTags",
 				"GameplayTasks",
 				"ModularGameplay",
 				"DeveloperSettings",
+				"GameplayAbilities"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

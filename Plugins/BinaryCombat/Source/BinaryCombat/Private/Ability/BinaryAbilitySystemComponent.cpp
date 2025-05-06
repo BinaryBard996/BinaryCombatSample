@@ -5,6 +5,7 @@
 
 #include "BinaryCombatLog.h"
 #include "Ability/BinaryGameplayAbility.h"
+#include "Turnbased/GameplayAbilityTurnBasedBlueprint.h"
 
 FGameplayAbilitySpecHandle UBinaryAbilitySystemComponent::GiveAbilityWithParams(
 	const FBinaryAbilityInitParams& AbilityInitParams)
@@ -23,8 +24,13 @@ FGameplayAbilitySpecHandle UBinaryAbilitySystemComponent::GiveAbilityWithParams(
 	return GiveAbility(AbilitySpec);
 }
 
+void UBinaryAbilitySystemComponent::TickTurn(int32 Delta)
+{
+	UGameplayAbilityTurnBasedBlueprint::TickTurn(this, Delta);
+}
+
 float UBinaryAbilitySystemComponent::EvaluateAbilityAttribute(FGameplayTag AttributeTag,
-	FGameplayAbilitySpecHandle AbilityHandle)
+                                                              FGameplayAbilitySpecHandle AbilityHandle)
 {
 	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(AbilityHandle);
 	if(!AbilitySpec)

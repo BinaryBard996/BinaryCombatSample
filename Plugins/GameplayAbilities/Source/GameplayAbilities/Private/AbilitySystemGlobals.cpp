@@ -28,6 +28,8 @@
 #include "Editor.h"
 #endif
 
+#include "Kismet/GameplayStatics.h"
+
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AbilitySystemGlobals)
 
 namespace UE::AbilitySystemGlobals
@@ -696,6 +698,33 @@ void UAbilitySystemGlobals::Notify_FindAssetInEditor(FString AssetName, int Asse
 {
 	AbilityFindAssetInEditorCallbacks.Broadcast(AssetName, AssetType);
 }
+
+// TurnBased Ability Timer start
+void UAbilitySystemGlobals::FinishDestroy()
+{
+	UObject::FinishDestroy();
+	DestroyAbilityTimerManager();
+}
+
+FAbilityTimerManager& UAbilitySystemGlobals::GetAbilityTimerManager()
+{
+	if(!AbilityTimerManager)
+	{
+		UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(GetWorld());
+		AbilityTimerManager = new FAbilityTimerManager(GameInstance);
+	}
+	return *AbilityTimerManager;
+}
+
+void UAbilitySystemGlobals::DestroyAbilityTimerManager()
+{
+	if(AbilityTimerManager)
+	{
+		delete AbilityTimerManager;
+		AbilityTimerManager = nullptr;
+	}
+}
+// ~TurnBased Ability Timer start
 
 void UAbilitySystemGlobals::NonShipping_ApplyGlobalAbilityScaler_Rate(float& Rate)
 {

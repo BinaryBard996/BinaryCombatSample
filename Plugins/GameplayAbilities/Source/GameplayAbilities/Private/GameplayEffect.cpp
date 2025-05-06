@@ -34,6 +34,7 @@
 #include "GameplayEffectComponents/RemoveOtherGameplayEffectComponent.h"
 #include "GameplayEffectComponents/TargetTagRequirementsGameplayEffectComponent.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
+#include "Turnbased/GameplayAbilitiesTurnBasedSettings.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(GameplayEffect)
 
@@ -4177,6 +4178,12 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 	const float DurationBaseValue = AppliedEffectSpec.GetDuration();
 
+	// TurnBased Ability Timer Function
+	FGameplayTagContainer AssetTagContainer;
+	Spec.GetAllAssetTags(AssetTagContainer);
+	const bool bTurnBased = AssetTagContainer.HasTag(GetDefault<UGameplayAbilitiesTurnBasedSettings>()->GameplayEffectTurnBasedTag);
+	// ~TurnBased Ability Timer Function
+
 	// Calculate Duration mods if we have a real duration
 	if (DurationBaseValue > 0.f)
 	{
@@ -4194,31 +4201,65 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 		// Register duration callbacks with the timer manager
 		if (Owner && bSetDuration)
 		{
-			FTimerManager& TimerManager = Owner->GetWorld()->GetTimerManager();
-			FTimerDelegate Delegate = FTimerDelegate::CreateUObject(Owner, &UAbilitySystemComponent::CheckDurationExpired, AppliedActiveGE->Handle);
-			TimerManager.SetTimer(AppliedActiveGE->DurationHandle, Delegate, FinalDuration, false);
-			if (!ensureMsgf(AppliedActiveGE->DurationHandle.IsValid(), TEXT("Invalid Duration Handle after attempting to set duration for GE (%s) @ %.2f"), 
-				*AppliedActiveGE->GetDebugString(), FinalDuration))
+			// TurnBased Ability Timer Function
+			if(!bTurnBased)
 			{
-				// Force this off next frame
-				TimerManager.SetTimerForNextTick(Delegate);
+				FTimerManager& TimerManager = Owner->GetWorld()->GetTimerManager();
+				FTimerDelegate Delegate = FTimerDelegate::CreateUObject(Owner, &UAbilitySystemComponent::CheckDurationExpired, AppliedActiveGE->Handle);
+				TimerManager.SetTimer(AppliedActiveGE->DurationHandle, Delegate, FinalDuration, false);
+				if (!ensureMsgf(AppliedActiveGE->DurationHandle.IsValid(), TEXT("Invalid Duration Handle after attempting to set duration for GE (%s) @ %.2f"), 
+					*AppliedActiveGE->GetDebugString(), FinalDuration))
+				{
+					// Force this off next frame
+					TimerManager.SetTimerForNextTick(Delegate);
+				}
 			}
+			else
+			{
+				FAbilityTimerManager& AbilityTimerManager = UAbilitySystemGlobals::Get().GetAbilityTimerManager();
+				FTimerDelegate Delegate = FTimerDelegate::CreateUObject(Owner, &UAbilitySystemComponent::CheckDurationExpired, AppliedActiveGE->Handle);
+				AbilityTimerManager.SetAbilityTimer(Owner, AppliedActiveGE->DurationHandle, Delegate, FinalDuration, false);
+				if (!ensureMsgf(AppliedActiveGE->DurationHandle.IsValid(), TEXT("Invalid Duration Handle after attempting to set duration for GE (%s) @ %.2f"), 
+					*AppliedActiveGE->GetDebugString(), FinalDuration))
+				{
+					// Force this off next frame
+					AbilityTimerManager.SetAbilityTimerForNextTick(Delegate);
+				}
+			}
+			// ~TurnBased Ability Timer Function
 		}
 	}
 	
 	// Register period callbacks with the timer manager
 	if (bSetPeriod && Owner && (AppliedEffectSpec.GetPeriod() > UGameplayEffect::NO_PERIOD))
 	{
-		FTimerManager& TimerManager = Owner->GetWorld()->GetTimerManager();
-		FTimerDelegate Delegate = FTimerDelegate::CreateUObject(Owner, &UAbilitySystemComponent::ExecutePeriodicEffect, AppliedActiveGE->Handle);
-			
-		// The timer manager moves things from the pending list to the active list after checking the active list on the first tick so we need to execute here
-		if (AppliedEffectSpec.Def->bExecutePeriodicEffectOnApplication)
+		// TurnBased Ability Timer Function
+		if(!bTurnBased)
 		{
-			TimerManager.SetTimerForNextTick(Delegate);
-		}
+			FAbilityTimerManager& AbilityTimerManager = UAbilitySystemGlobals::Get().GetAbilityTimerManager();
+			FTimerDelegate Delegate = FTimerDelegate::CreateUObject(Owner, &UAbilitySystemComponent::ExecutePeriodicEffect, AppliedActiveGE->Handle);
+			// The timer manager moves things from the pending list to the active list after checking the active list on the first tick so we need to execute here
+			if (AppliedEffectSpec.Def->bExecutePeriodicEffectOnApplication)
+			{
+				AbilityTimerManager.SetAbilityTimerForNextTick(Delegate);
+			}
 
-		TimerManager.SetTimer(AppliedActiveGE->PeriodHandle, Delegate, AppliedEffectSpec.GetPeriod(), true);
+			AbilityTimerManager.SetAbilityTimer(Owner, AppliedActiveGE->PeriodHandle, Delegate, AppliedEffectSpec.GetPeriod(), true);
+		}
+		else
+		{
+			FTimerManager& TimerManager = Owner->GetWorld()->GetTimerManager();
+			FTimerDelegate Delegate = FTimerDelegate::CreateUObject(Owner, &UAbilitySystemComponent::ExecutePeriodicEffect, AppliedActiveGE->Handle);
+			
+			// The timer manager moves things from the pending list to the active list after checking the active list on the first tick so we need to execute here
+			if (AppliedEffectSpec.Def->bExecutePeriodicEffectOnApplication)
+			{
+				TimerManager.SetTimerForNextTick(Delegate);
+			}
+
+			TimerManager.SetTimer(AppliedActiveGE->PeriodHandle, Delegate, AppliedEffectSpec.GetPeriod(), true);
+		}
+		// ~TurnBased Ability Timer Function
 	}
 
 	if (InPredictionKey.IsLocalClientKey() == false || IsNetAuthority())	// Clients predicting a GameplayEffect must not call MarkItemDirty
@@ -4324,16 +4365,36 @@ void FActiveGameplayEffectsContainer::AddActiveGameplayEffectGrantedTagsAndModif
 	{
 		if (Effect.Spec.Def->PeriodicInhibitionPolicy != EGameplayEffectPeriodInhibitionRemovedPolicy::NeverReset && Owner && Owner->IsOwnerActorAuthoritative())
 		{
-			FTimerManager& TimerManager = Owner->GetWorld()->GetTimerManager();
-			FTimerDelegate Delegate = FTimerDelegate::CreateUObject(Owner, &UAbilitySystemComponent::ExecutePeriodicEffect, Effect.Handle);
-
-			// The timer manager moves things from the pending list to the active list after checking the active list on the first tick so we need to execute here
-			if (Effect.Spec.Def->PeriodicInhibitionPolicy == EGameplayEffectPeriodInhibitionRemovedPolicy::ExecuteAndResetPeriod)
+			// TurnBased Ability Timer Function
+			FGameplayTagContainer AllAssetTags;
+			Effect.Spec.GetAllAssetTags(AllAssetTags);
+			if(!AllAssetTags.HasTag(GetDefault<UGameplayAbilitiesTurnBasedSettings>()->GameplayEffectTurnBasedTag))
 			{
-				TimerManager.SetTimerForNextTick(Delegate);
-			}
+				FTimerManager& TimerManager = Owner->GetWorld()->GetTimerManager();
+				FTimerDelegate Delegate = FTimerDelegate::CreateUObject(Owner, &UAbilitySystemComponent::ExecutePeriodicEffect, Effect.Handle);
 
-			TimerManager.SetTimer(Effect.PeriodHandle, Delegate, Effect.Spec.GetPeriod(), true);
+				// The timer manager moves things from the pending list to the active list after checking the active list on the first tick so we need to execute here
+				if (Effect.Spec.Def->PeriodicInhibitionPolicy == EGameplayEffectPeriodInhibitionRemovedPolicy::ExecuteAndResetPeriod)
+				{
+					TimerManager.SetTimerForNextTick(Delegate);
+				}
+
+				TimerManager.SetTimer(Effect.PeriodHandle, Delegate, Effect.Spec.GetPeriod(), true);
+			}
+			else
+			{
+				FAbilityTimerManager& AbilityTimerManager = UAbilitySystemGlobals::Get().GetAbilityTimerManager();
+				FTimerDelegate Delegate = FTimerDelegate::CreateUObject(Owner, &UAbilitySystemComponent::ExecutePeriodicEffect, Effect.Handle);
+
+				// The timer manager moves things from the pending list to the active list after checking the active list on the first tick so we need to execute here
+				if (Effect.Spec.Def->PeriodicInhibitionPolicy == EGameplayEffectPeriodInhibitionRemovedPolicy::ExecuteAndResetPeriod)
+				{
+					AbilityTimerManager.SetAbilityTimerForNextTick(Delegate);
+				}
+
+				AbilityTimerManager.SetAbilityTimer(Owner, Effect.PeriodHandle, Delegate, Effect.Spec.GetPeriod(), true);
+			}
+			// ~TurnBased Ability Timer Function
 		}
 	}
 
@@ -5085,59 +5146,122 @@ void FActiveGameplayEffectsContainer::CheckDuration(FActiveGameplayEffectHandle 
 			RefreshDurationTimer = true;
 		}
 
-		FTimerManager& TimerManager = Owner->GetWorld()->GetTimerManager();
-		if (CheckForFinalPeriodicExec)
+		// TurnBased Ability Timer Function
+		FGameplayTagContainer AllAssetTags;
+		Effect.Spec.GetAllAssetTags(AllAssetTags);
+		if(!AllAssetTags.HasTag(GetDefault<UGameplayAbilitiesTurnBasedSettings>()->GameplayEffectTurnBasedTag))
 		{
-			// This gameplay effect has hit its duration. Check if it needs to execute one last time before removing it.
-			if (Effect.PeriodHandle.IsValid() && TimerManager.TimerExists(Effect.PeriodHandle))
+			FTimerManager& TimerManager = Owner->GetWorld()->GetTimerManager();
+			if (CheckForFinalPeriodicExec)
 			{
-				float PeriodTimeRemaining = TimerManager.GetTimerRemaining(Effect.PeriodHandle);
-				if (PeriodTimeRemaining <= KINDA_SMALL_NUMBER && !Effect.bIsInhibited)
+				// This gameplay effect has hit its duration. Check if it needs to execute one last time before removing it.
+				if (Effect.PeriodHandle.IsValid() && TimerManager.TimerExists(Effect.PeriodHandle))
 				{
-					InternalExecutePeriodicGameplayEffect(Effect);
-
-					// The call to ExecuteActiveEffectsFrom in InternalExecutePeriodicGameplayEffect could cause this effect to be explicitly removed
-					// (for example it could kill the owner and cause the effect to be wiped via death).
-					// In that case, we need to early out instead of possibly continuing to the below calls to InternalRemoveActiveGameplayEffect
-					if ( Effect.IsPendingRemove )
+					float PeriodTimeRemaining = TimerManager.GetTimerRemaining(Effect.PeriodHandle);
+					if (PeriodTimeRemaining <= KINDA_SMALL_NUMBER && !Effect.bIsInhibited)
 					{
-						break;
+						InternalExecutePeriodicGameplayEffect(Effect);
+
+						// The call to ExecuteActiveEffectsFrom in InternalExecutePeriodicGameplayEffect could cause this effect to be explicitly removed
+						// (for example it could kill the owner and cause the effect to be wiped via death).
+						// In that case, we need to early out instead of possibly continuing to the below calls to InternalRemoveActiveGameplayEffect
+						if ( Effect.IsPendingRemove )
+						{
+							break;
+						}
 					}
+
+					// Forcibly clear the periodic ticks because this effect is going to be removed
+					TimerManager.ClearTimer(Effect.PeriodHandle);
 				}
-
-				// Forcibly clear the periodic ticks because this effect is going to be removed
-				TimerManager.ClearTimer(Effect.PeriodHandle);
 			}
-		}
 
-		if (StacksToRemove >= -1)
-		{
-			InternalRemoveActiveGameplayEffect(ActiveGEIdx, StacksToRemove, false);
-		}
-
-		if (RefreshStartTime)
-		{
-			RestartActiveGameplayEffectDuration(Effect);
-		}
-
-		if (RefreshDurationTimer)
-		{
-			// Always reset the timer, since the duration might have been modified
-			FTimerDelegate Delegate = FTimerDelegate::CreateUObject(Owner, &UAbilitySystemComponent::CheckDurationExpired, Effect.Handle);
-
-			float NewTimerDuration = (Effect.StartWorldTime + Duration) - CurrentTime;
-			TimerManager.SetTimer(Effect.DurationHandle, Delegate, NewTimerDuration, false);
-
-			if (Effect.DurationHandle.IsValid() == false)
+			if (StacksToRemove >= -1)
 			{
-				UE_LOG(LogGameplayEffects, Warning, TEXT("Failed to set new timer in ::CheckDuration. Timer trying to be set for: %.2f. Removing GE instead"), NewTimerDuration);
-				if (!Effect.IsPendingRemove)
+				InternalRemoveActiveGameplayEffect(ActiveGEIdx, StacksToRemove, false);
+			}
+
+			if (RefreshStartTime)
+			{
+				RestartActiveGameplayEffectDuration(Effect);
+			}
+
+			if (RefreshDurationTimer)
+			{
+				// Always reset the timer, since the duration might have been modified
+				FTimerDelegate Delegate = FTimerDelegate::CreateUObject(Owner, &UAbilitySystemComponent::CheckDurationExpired, Effect.Handle);
+
+				float NewTimerDuration = (Effect.StartWorldTime + Duration) - CurrentTime;
+				TimerManager.SetTimer(Effect.DurationHandle, Delegate, NewTimerDuration, false);
+
+				if (Effect.DurationHandle.IsValid() == false)
 				{
-					InternalRemoveActiveGameplayEffect(ActiveGEIdx, -1, false);
+					UE_LOG(LogGameplayEffects, Warning, TEXT("Failed to set new timer in ::CheckDuration. Timer trying to be set for: %.2f. Removing GE instead"), NewTimerDuration);
+					if (!Effect.IsPendingRemove)
+					{
+						InternalRemoveActiveGameplayEffect(ActiveGEIdx, -1, false);
+					}
+					check(Effect.IsPendingRemove);
 				}
-				check(Effect.IsPendingRemove);
 			}
 		}
+		else
+		{
+			FAbilityTimerManager& AbilityTimerManager = UAbilitySystemGlobals::Get().GetAbilityTimerManager();
+			if (CheckForFinalPeriodicExec)
+			{
+				// This gameplay effect has hit its duration. Check if it needs to execute one last time before removing it.
+				if (Effect.PeriodHandle.IsValid() && AbilityTimerManager.AbilityTimerExists(Owner, Effect.PeriodHandle))
+				{
+					float PeriodTimeRemaining = AbilityTimerManager.GetAbilityTimerRemaining(Owner, Effect.PeriodHandle);
+					if (PeriodTimeRemaining <= KINDA_SMALL_NUMBER && !Effect.bIsInhibited)
+					{
+						InternalExecutePeriodicGameplayEffect(Effect);
+
+						// The call to ExecuteActiveEffectsFrom in InternalExecutePeriodicGameplayEffect could cause this effect to be explicitly removed
+						// (for example it could kill the owner and cause the effect to be wiped via death).
+						// In that case, we need to early out instead of possibly continuing to the below calls to InternalRemoveActiveGameplayEffect
+						if ( Effect.IsPendingRemove )
+						{
+							break;
+						}
+					}
+
+					// Forcibly clear the periodic ticks because this effect is going to be removed
+					AbilityTimerManager.ClearAbilityTimer(Owner, Effect.PeriodHandle);
+				}
+			}
+
+			if (StacksToRemove >= -1)
+			{
+				InternalRemoveActiveGameplayEffect(ActiveGEIdx, StacksToRemove, false);
+			}
+
+			if (RefreshStartTime)
+			{
+				RestartActiveGameplayEffectDuration(Effect);
+			}
+
+			if (RefreshDurationTimer)
+			{
+				// Always reset the timer, since the duration might have been modified
+				FTimerDelegate Delegate = FTimerDelegate::CreateUObject(Owner, &UAbilitySystemComponent::CheckDurationExpired, Effect.Handle);
+
+				float NewTimerDuration = (Effect.StartWorldTime + Duration) - CurrentTime;
+				AbilityTimerManager.SetAbilityTimer(Owner, Effect.DurationHandle, Delegate, NewTimerDuration, false);
+
+				if (Effect.DurationHandle.IsValid() == false)
+				{
+					UE_LOG(LogGameplayEffects, Warning, TEXT("Failed to set new timer in ::CheckDuration. Timer trying to be set for: %.2f. Removing GE instead"), NewTimerDuration);
+					if (!Effect.IsPendingRemove)
+					{
+						InternalRemoveActiveGameplayEffect(ActiveGEIdx, -1, false);
+					}
+					check(Effect.IsPendingRemove);
+				}
+			}
+		}
+		// ~TurnBased Ability Timer Function
 
 		break;
 	}

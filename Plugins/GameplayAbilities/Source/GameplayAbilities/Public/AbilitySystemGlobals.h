@@ -9,6 +9,7 @@
 #include "GameplayTagContainer.h"
 #include "GameplayEffectTypes.h"
 #include "GameplayAbilitiesModule.h"
+#include "Turnbased/AbilityTimerManager.h"
 #include "AbilitySystemGlobals.generated.h"
 
 class UAbilitySystemComponent;
@@ -442,6 +443,16 @@ public:
 	//...for finding assets directly from the game.
 	void Notify_FindAssetInEditor(FString AssetName, int AssetType);
 	FOnAbilitySystemAssetFoundDelegate AbilityFindAssetInEditorCallbacks;
+
+	// TurnBased Ability Timer start
+public:
+	virtual void FinishDestroy() override;
+	FAbilityTimerManager& GetAbilityTimerManager();
+	void DestroyAbilityTimerManager();
+
+private:
+	FAbilityTimerManager* AbilityTimerManager;
+	// ~TurnBased Ability Timer start
 };
 
 /** Scope object that indicates when a gameplay effect is being applied */

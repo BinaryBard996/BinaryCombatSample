@@ -95,8 +95,25 @@ float FAbilityTimerManager::GetAbilityTimerRemaining(UAbilitySystemComponent* Ab
 	return RemainingTime;
 }
 
+bool FAbilityTimerManager::AbilityTimerExists(UAbilitySystemComponent* AbilitySystemComponent,
+	FTimerHandle Handle) const
+{
+	if(!IsValid(AbilitySystemComponent))
+	{
+		return false;
+	}
+
+	const FAbilityTimerContainer* AbilityTimerContainer = GetAbilityTimerContainer(AbilitySystemComponent);
+	if(!AbilityTimerContainer)
+	{
+		return false;
+	}
+
+	return AbilityTimerContainer->TimerHandles.Contains(Handle);
+}
+
 void FAbilityTimerManager::SetAbilityTimer(UAbilitySystemComponent* AbilitySystemComponent, FTimerHandle& InOutHandle,
-	FTimerDelegate const& InDelegate, float InRate, bool bInLoop, float InFirstDelay)
+                                           FTimerDelegate const& InDelegate, float InRate, bool bInLoop, float InFirstDelay)
 {
 	if(!IsValid(AbilitySystemComponent))
 	{
@@ -133,7 +150,13 @@ void FAbilityTimerManager::ClearAbilityTimer(UAbilitySystemComponent* AbilitySys
 
 void FAbilityTimerManager::SetAbilityTimerForNextTick(FTimerDelegate const& InDelegate)
 {
-	InDelegate.ExecuteIfBound();
+	if(AbilityOwningGameInstance)
+	{
+		if(UWorld* World = AbilityOwningGameInstance->GetWorld())
+		{
+			World->GetTimerManager().SetTimerForNextTick(InDelegate);
+		}
+	}
 }
 
 void FAbilityTimerManager::ClearAllAbilityTimerContainers()
@@ -147,6 +170,12 @@ void FAbilityTimerManager::ClearAllAbilityTimerContainers()
 	}
 
 	AbilityTimerContainers.Reset();
+}
+
+const FAbilityTimerContainer* FAbilityTimerManager::GetAbilityTimerContainer(
+	UAbilitySystemComponent* AbilitySystemComponent) const
+{
+	return AbilityTimerContainers.Find(AbilitySystemComponent);
 }
 
 FAbilityTimerContainer& FAbilityTimerManager::GetAbilityTimerContainer(UAbilitySystemComponent* AbilitySystemComponent)
