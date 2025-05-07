@@ -1996,5 +1996,27 @@ protected:
 	};
 
 	TArray<FAbilityListLockActiveChange*> AbilityListLockActiveChanges;
+
+	// TurnBased Support
+public:
+	UFUNCTION(BlueprintPure, Category=TurnBased)
+	bool IsTurnBased() const { return bTurnBased; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetTurnBasedEnabled(bool bEnabled = false) { bTurnBased = bEnabled; }
+
+	UFUNCTION(BlueprintPure)
+	int32 GetCurrentTurn() const { return CurrentTurn; }
+	
+	void TickTurn(int32 Delta = 1);
+	void ResetTurn();
+	
+protected:
+	UPROPERTY(EditAnywhere, Category=TurnBased)
+	bool bTurnBased = false;
+
+	UPROPERTY(Replicated)
+	int32 CurrentTurn = 0;
+	// ~TurnBased Support
 	
 };

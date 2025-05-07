@@ -1308,11 +1308,7 @@ struct GAMEPLAYABILITIES_API FActiveGameplayEffect : public FFastArraySerializer
 	FActiveGameplayEffect& operator=(FActiveGameplayEffect&& other);
 	FActiveGameplayEffect& operator=(const FActiveGameplayEffect& other);
 
-	float GetTimeRemaining(float WorldTime) const
-	{
-		float Duration = GetDuration();		
-		return (Duration == FGameplayEffectConstants::INFINITE_DURATION ? -1.f : Duration - (WorldTime - StartWorldTime));
-	}
+	float GetTimeRemaining(float WorldTime) const;
 	
 	float GetDuration() const
 	{

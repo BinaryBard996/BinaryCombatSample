@@ -15,11 +15,11 @@ public:
 class GAMEPLAYABILITIES_API FAbilityTimerManager: public FTimerManager
 {
 public:
-	FAbilityTimerManager(){}
 	FAbilityTimerManager(UGameInstance* InGameInstance): FTimerManager(InGameInstance){ AbilityOwningGameInstance = InGameInstance; }
 	
 	void TickTurn(UAbilitySystemComponent* AbilitySystemComponent, int Delta = 1);
 	float GetAbilityTimerRemaining(UAbilitySystemComponent* AbilitySystemComponent, FTimerHandle& InHandle);
+	float GetAbilityCurrentTurn(UAbilitySystemComponent* AbilitySystemComponent) const;
 
 	bool AbilityTimerExists(UAbilitySystemComponent* AbilitySystemComponent, FTimerHandle Handle) const;
 	void SetAbilityTimer(UAbilitySystemComponent* AbilitySystemComponent, FTimerHandle& InOutHandle, FTimerDelegate const& InDelegate, float InRate, bool bInLoop, float InFirstDelay = -1.f);

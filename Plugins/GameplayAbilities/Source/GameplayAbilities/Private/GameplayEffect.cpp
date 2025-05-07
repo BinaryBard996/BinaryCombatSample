@@ -34,7 +34,6 @@
 #include "GameplayEffectComponents/RemoveOtherGameplayEffectComponent.h"
 #include "GameplayEffectComponents/TargetTagRequirementsGameplayEffectComponent.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
-#include "Turnbased/GameplayAbilitiesTurnBasedSettings.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(GameplayEffect)
 
@@ -2645,6 +2644,25 @@ FActiveGameplayEffect& FActiveGameplayEffect::operator=(const FActiveGameplayEff
 	return *this;
 }
 
+float FActiveGameplayEffect::GetTimeRemaining(float WorldTime) const
+{
+	// TurnBased Support
+	if(Handle.GetOwningAbilitySystemComponent() && Handle.GetOwningAbilitySystemComponent()->IsTurnBased())
+	{
+		FAbilityTimerManager& AbilityTimerContainer = UAbilitySystemGlobals::Get().GetAbilityTimerManager();
+		float CurrentTurn = AbilityTimerContainer.GetAbilityCurrentTurn(Handle.GetOwningAbilitySystemComponent());
+			
+		float Duration = GetDuration();
+		return (Duration == FGameplayEffectConstants::INFINITE_DURATION ? -1.f : Duration - (CurrentTurn - StartWorldTime));
+	}
+	else
+	{
+		float Duration = GetDuration();
+		return (Duration == FGameplayEffectConstants::INFINITE_DURATION ? -1.f : Duration - (WorldTime - StartWorldTime));
+	}
+	// ~TurnBased Support
+}
+
 void FActiveGameplayEffect::CheckOngoingTagRequirements(const FGameplayTagContainer& OwnerTags, FActiveGameplayEffectsContainer& OwningContainer, bool bInvokeGameplayCueEvents)
 {
 
@@ -4178,11 +4196,9 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 	const float DurationBaseValue = AppliedEffectSpec.GetDuration();
 
-	// TurnBased Ability Timer Function
-	FGameplayTagContainer AssetTagContainer;
-	Spec.GetAllAssetTags(AssetTagContainer);
-	const bool bTurnBased = AssetTagContainer.HasTag(GetDefault<UGameplayAbilitiesTurnBasedSettings>()->GameplayEffectTurnBasedTag);
-	// ~TurnBased Ability Timer Function
+	// TurnBased Support
+	const bool bTurnBased = Owner->IsTurnBased();
+	// ~TurnBased Support
 
 	// Calculate Duration mods if we have a real duration
 	if (DurationBaseValue > 0.f)
@@ -4201,7 +4217,7 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 		// Register duration callbacks with the timer manager
 		if (Owner && bSetDuration)
 		{
-			// TurnBased Ability Timer Function
+			// TurnBased Support
 			if(!bTurnBased)
 			{
 				FTimerManager& TimerManager = Owner->GetWorld()->GetTimerManager();
@@ -4226,14 +4242,14 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 					AbilityTimerManager.SetAbilityTimerForNextTick(Delegate);
 				}
 			}
-			// ~TurnBased Ability Timer Function
+			// ~TurnBased Support
 		}
 	}
 	
 	// Register period callbacks with the timer manager
 	if (bSetPeriod && Owner && (AppliedEffectSpec.GetPeriod() > UGameplayEffect::NO_PERIOD))
 	{
-		// TurnBased Ability Timer Function
+		// TurnBased Support
 		if(!bTurnBased)
 		{
 			FAbilityTimerManager& AbilityTimerManager = UAbilitySystemGlobals::Get().GetAbilityTimerManager();
@@ -4259,7 +4275,7 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 			TimerManager.SetTimer(AppliedActiveGE->PeriodHandle, Delegate, AppliedEffectSpec.GetPeriod(), true);
 		}
-		// ~TurnBased Ability Timer Function
+		// ~TurnBased Support
 	}
 
 	if (InPredictionKey.IsLocalClientKey() == false || IsNetAuthority())	// Clients predicting a GameplayEffect must not call MarkItemDirty
@@ -4365,10 +4381,8 @@ void FActiveGameplayEffectsContainer::AddActiveGameplayEffectGrantedTagsAndModif
 	{
 		if (Effect.Spec.Def->PeriodicInhibitionPolicy != EGameplayEffectPeriodInhibitionRemovedPolicy::NeverReset && Owner && Owner->IsOwnerActorAuthoritative())
 		{
-			// TurnBased Ability Timer Function
-			FGameplayTagContainer AllAssetTags;
-			Effect.Spec.GetAllAssetTags(AllAssetTags);
-			if(!AllAssetTags.HasTag(GetDefault<UGameplayAbilitiesTurnBasedSettings>()->GameplayEffectTurnBasedTag))
+			// TurnBased Support
+			if(!Owner->IsTurnBased())
 			{
 				FTimerManager& TimerManager = Owner->GetWorld()->GetTimerManager();
 				FTimerDelegate Delegate = FTimerDelegate::CreateUObject(Owner, &UAbilitySystemComponent::ExecutePeriodicEffect, Effect.Handle);
@@ -4394,7 +4408,7 @@ void FActiveGameplayEffectsContainer::AddActiveGameplayEffectGrantedTagsAndModif
 
 				AbilityTimerManager.SetAbilityTimer(Owner, Effect.PeriodHandle, Delegate, Effect.Spec.GetPeriod(), true);
 			}
-			// ~TurnBased Ability Timer Function
+			// ~TurnBased Support
 		}
 	}
 
@@ -5064,20 +5078,39 @@ bool FActiveGameplayEffectsContainer::IsServerWorldTimeAvailable() const
 
 float FActiveGameplayEffectsContainer::GetServerWorldTime() const
 {
-	UWorld* World = Owner->GetWorld();
-	AGameStateBase* GameState = World->GetGameState();
-	if (GameState)
+	// TurnBased Support
+	if(!Owner->IsTurnBased())
 	{
-		return GameState->GetServerWorldTimeSeconds();
-	}
+		UWorld* World = Owner->GetWorld();
+		AGameStateBase* GameState = World->GetGameState();
+		if (GameState)
+		{
+			return GameState->GetServerWorldTimeSeconds();
+		}
 
-	return World->GetTimeSeconds();
+		return World->GetTimeSeconds();
+	}
+	else
+	{
+		return GetWorldTime();
+	}
+	// ~TurnBased Support
 }
 
 float FActiveGameplayEffectsContainer::GetWorldTime() const
 {
-	UWorld *World = Owner->GetWorld();
-	return World->GetTimeSeconds();
+	// TurnBased Support
+	if(!Owner->IsTurnBased())
+	{
+		UWorld *World = Owner->GetWorld();
+		return World->GetTimeSeconds();
+	}
+	else
+	{
+		FAbilityTimerManager& AbilityTimerManager = UAbilitySystemGlobals::Get().GetAbilityTimerManager();
+		return AbilityTimerManager.GetAbilityCurrentTurn(Owner);
+	}
+	// ~TurnBased Support
 }
 
 void FActiveGameplayEffectsContainer::CheckDuration(FActiveGameplayEffectHandle Handle)
@@ -5146,10 +5179,8 @@ void FActiveGameplayEffectsContainer::CheckDuration(FActiveGameplayEffectHandle 
 			RefreshDurationTimer = true;
 		}
 
-		// TurnBased Ability Timer Function
-		FGameplayTagContainer AllAssetTags;
-		Effect.Spec.GetAllAssetTags(AllAssetTags);
-		if(!AllAssetTags.HasTag(GetDefault<UGameplayAbilitiesTurnBasedSettings>()->GameplayEffectTurnBasedTag))
+		// TurnBased Support
+		if(!Owner->IsTurnBased())
 		{
 			FTimerManager& TimerManager = Owner->GetWorld()->GetTimerManager();
 			if (CheckForFinalPeriodicExec)
@@ -5261,7 +5292,7 @@ void FActiveGameplayEffectsContainer::CheckDuration(FActiveGameplayEffectHandle 
 				}
 			}
 		}
-		// ~TurnBased Ability Timer Function
+		// ~TurnBased Support
 
 		break;
 	}

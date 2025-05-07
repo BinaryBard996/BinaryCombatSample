@@ -25,6 +25,7 @@ void FAbilityTimerManager::TickTurn(UAbilitySystemComponent* AbilitySystemCompon
 	for(int32 Step = 0; Step < Delta; ++Step)
 	{
 		AbilityTimerContainer.Turn++;
+		AbilitySystemComponent->TickTurn(1);
 
 		TArray<FTimerHandle> RemoveTimerHandles;
 		for(FTimerHandle& Handle: AbilityTimerContainer.TimerHandles)
@@ -95,8 +96,24 @@ float FAbilityTimerManager::GetAbilityTimerRemaining(UAbilitySystemComponent* Ab
 	return RemainingTime;
 }
 
+float FAbilityTimerManager::GetAbilityCurrentTurn(UAbilitySystemComponent* AbilitySystemComponent) const
+{
+	if(!IsValid(AbilitySystemComponent))
+	{
+		return 0.f;
+	}
+
+	const FAbilityTimerContainer* AbilityTimerContainer = GetAbilityTimerContainer(AbilitySystemComponent);
+	if(!AbilityTimerContainer)
+	{
+		return 0.f;
+	}
+
+	return AbilityTimerContainer->Turn;
+}
+
 bool FAbilityTimerManager::AbilityTimerExists(UAbilitySystemComponent* AbilitySystemComponent,
-	FTimerHandle Handle) const
+                                              FTimerHandle Handle) const
 {
 	if(!IsValid(AbilitySystemComponent))
 	{
@@ -163,6 +180,11 @@ void FAbilityTimerManager::ClearAllAbilityTimerContainers()
 {
 	for(auto& AbilityTimerContainer: AbilityTimerContainers)
 	{
+		if(AbilityTimerContainer.Key.IsValid())
+		{
+			AbilityTimerContainer.Key.Get()->ResetTurn();	
+		}
+		
 		for(auto& TimerHandle: AbilityTimerContainer.Value.TimerHandles)
 		{
 			ClearTimer(TimerHandle);

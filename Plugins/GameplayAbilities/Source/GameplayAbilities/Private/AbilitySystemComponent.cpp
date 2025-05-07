@@ -3265,6 +3265,16 @@ const FMinimalReplicationTagCountMap& UAbilitySystemComponent::GetReplicatedLoos
 	return ReplicatedLooseTags;
 }
 
+void UAbilitySystemComponent::TickTurn(int32 Delta)
+{
+	CurrentTurn += Delta;
+}
+
+void UAbilitySystemComponent::ResetTurn()
+{
+	CurrentTurn = 0;
+}
+
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 #undef LOCTEXT_NAMESPACE
