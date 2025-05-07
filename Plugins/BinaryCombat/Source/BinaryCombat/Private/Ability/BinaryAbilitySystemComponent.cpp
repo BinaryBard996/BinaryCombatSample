@@ -5,7 +5,6 @@
 
 #include "BinaryCombatLog.h"
 #include "Ability/BinaryGameplayAbility.h"
-#include "Turnbased/GameplayAbilityTurnBasedBlueprint.h"
 
 FGameplayAbilitySpecHandle UBinaryAbilitySystemComponent::GiveAbilityWithParams(
 	const FBinaryAbilityInitParams& AbilityInitParams)
@@ -22,11 +21,6 @@ FGameplayAbilitySpecHandle UBinaryAbilitySystemComponent::GiveAbilityWithParams(
 		AbilitySpec.SetByCallerTagMagnitudes.Add(AbilityAttribute.DataTag, AbilityAttribute.DataValue);
 	}
 	return GiveAbility(AbilitySpec);
-}
-
-void UBinaryAbilitySystemComponent::TickTurn(int32 Delta)
-{
-	UGameplayAbilityTurnBasedBlueprint::TickTurn(this, Delta);
 }
 
 float UBinaryAbilitySystemComponent::EvaluateAbilityAttribute(FGameplayTag AttributeTag,

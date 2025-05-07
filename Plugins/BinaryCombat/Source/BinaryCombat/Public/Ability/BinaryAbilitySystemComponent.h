@@ -21,9 +21,7 @@ class BINARYCOMBAT_API UBinaryAbilitySystemComponent : public UAbilitySystemComp
 public:
 	UFUNCTION(BlueprintCallable, Category="Ability")
 	FGameplayAbilitySpecHandle GiveAbilityWithParams(const FBinaryAbilityInitParams& AbilityInitParams);
-
-	UFUNCTION(BlueprintCallable)
-	void TickTurn(int32 Delta = 1);
+	
 	//------------------------------------------------------
 	//                 Ability Attribute
 	//------------------------------------------------------

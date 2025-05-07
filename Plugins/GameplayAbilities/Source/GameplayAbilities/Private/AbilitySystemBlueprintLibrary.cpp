@@ -1260,3 +1260,9 @@ bool UAbilitySystemBlueprintLibrary::NotEqual_GameplayAbilitySpecHandle(const FG
 {
 	return A != B;
 }
+
+void UAbilitySystemBlueprintLibrary::TickTurn(UAbilitySystemComponent* AbilitySystemComponent, int32 Delta)
+{
+	FAbilityTimerManager& TimerManager = UAbilitySystemGlobals::Get().GetAbilityTimerManager();
+	TimerManager.TickTurn(AbilitySystemComponent, Delta);
+}

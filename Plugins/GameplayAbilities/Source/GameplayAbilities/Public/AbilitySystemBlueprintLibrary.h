@@ -456,4 +456,12 @@ class GAMEPLAYABILITIES_API UAbilitySystemBlueprintLibrary : public UBlueprintFu
 	/** Inequality operator for two Gameplay Ability Spec Handles */
 	UFUNCTION(BlueprintPure, Category = "Ability|GameplayAbility", meta = (DisplayName = "Not Equal (Gameplay Ability Spec Handle)", CompactNodeTitle = "!=", ScriptOperator = "!="))
 	static bool NotEqual_GameplayAbilitySpecHandle(const FGameplayAbilitySpecHandle& A, const FGameplayAbilitySpecHandle& B);
+
+	// -------------------------------------------------------------------------------
+	//		TurnBased
+	// -------------------------------------------------------------------------------
+
+	/* Tick given AbilitySystemComponent's turn */
+	UFUNCTION(BlueprintCallable, Category = "Ability|TurnBased")
+	static void TickTurn(UAbilitySystemComponent* AbilitySystemComponent, int32 Delta = 1);
 };

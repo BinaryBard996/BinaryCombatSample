@@ -29,6 +29,10 @@
 		{
 			"Name": "ModularGameplay",
 			"Enabled": true
+		},
+		{
+			"Name": "GASAttachEditor",
+			"Enabled": true
 		}
 	]
 }
