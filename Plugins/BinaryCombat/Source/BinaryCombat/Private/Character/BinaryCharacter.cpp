@@ -6,11 +6,12 @@
 #include "Ability/BinaryAbilitySystemComponent.h"
 
 // Sets default values
-ABinaryCharacter::ABinaryCharacter()
+ABinaryCharacter::ABinaryCharacter(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	AbilitySystemComponent = CreateDefaultSubobject<UBinaryAbilitySystemComponent>("Ability System Component");
 }
 
 // Called when the game starts or when spawned
@@ -36,11 +37,11 @@ void ABinaryCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 UBinaryAbilitySystemComponent* ABinaryCharacter::GetBinaryAbilitySystemComponent() const
 {
-	return FindComponentByClass<UBinaryAbilitySystemComponent>();
+	return AbilitySystemComponent;
 }
 
 UAbilitySystemComponent* ABinaryCharacter::GetAbilitySystemComponent() const
 {
-	return FindComponentByClass<UBinaryAbilitySystemComponent>();
+	return AbilitySystemComponent;
 }
 

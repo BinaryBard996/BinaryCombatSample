@@ -18,7 +18,7 @@ class BINARYCOMBAT_API ABinaryCharacter
 
 public:
 	// Sets default values for this character's properties
-	ABinaryCharacter();
+	ABinaryCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 	// Actor interface
 	virtual void BeginPlay() override;
@@ -33,7 +33,7 @@ public:
 	// ~IAbilitySystemInterface
 
 protected:
-
-	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Binary|Character")
+	TObjectPtr<UBinaryAbilitySystemComponent> AbilitySystemComponent;
 
 };
