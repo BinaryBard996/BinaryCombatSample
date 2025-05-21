@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "ModularPlayerState.h"
 #include "GameFramework/PlayerState.h"
 #include "BinaryPlayerState.generated.h"
 
@@ -13,7 +14,7 @@ class UBinaryAbilitySystemComponent;
  */
 UCLASS()
 class BINARYCOMBAT_API ABinaryPlayerState
-	: public APlayerState
+	: public AModularPlayerState
 	, public IAbilitySystemInterface
 {
 	GENERATED_BODY()

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "ModularCharacter.h"
 #include "GameFramework/Character.h"
 #include "BinaryCharacter.generated.h"
 
@@ -11,8 +12,7 @@ class UBinaryAbilitySystemComponent;
 
 UCLASS()
 class BINARYCOMBAT_API ABinaryCharacter
-	: public ACharacter
-	, public IAbilitySystemInterface
+	: public AModularCharacter
 {
 	GENERATED_BODY()
 
@@ -26,14 +26,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// ~Actor interface
 
-	// IAbilitySystemInterface
-	UFUNCTION(BlueprintCallable, Category="Binary|Character")
-	UBinaryAbilitySystemComponent* GetBinaryAbilitySystemComponent() const;
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	// ~IAbilitySystemInterface
-
 protected:
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Binary|Character")
-	TObjectPtr<UBinaryAbilitySystemComponent> AbilitySystemComponent;
 
 };

@@ -10,8 +10,6 @@ ABinaryCharacter::ABinaryCharacter(const FObjectInitializer& ObjectInitializer):
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	AbilitySystemComponent = CreateDefaultSubobject<UBinaryAbilitySystemComponent>("Ability System Component");
 }
 
 // Called when the game starts or when spawned
@@ -33,15 +31,5 @@ void ABinaryCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-}
-
-UBinaryAbilitySystemComponent* ABinaryCharacter::GetBinaryAbilitySystemComponent() const
-{
-	return AbilitySystemComponent;
-}
-
-UAbilitySystemComponent* ABinaryCharacter::GetAbilitySystemComponent() const
-{
-	return AbilitySystemComponent;
 }
 
