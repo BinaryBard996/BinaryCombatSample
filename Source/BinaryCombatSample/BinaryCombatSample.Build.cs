@@ -16,7 +16,7 @@ public class BinaryCombatSample : ModuleRules
 				"Engine", 
 				"InputCore", 
 				"EnhancedInput",
-				"ModularGameplay"
+				"ModularGameplay",
 			});
 		
 		PrivateDependencyModuleNames.AddRange(

@@ -32,6 +32,8 @@ public class BinaryCombat : ModuleRules
 				"DeveloperSettings",
 				"GameplayAbilities",
 				"ModularGameplayActors",
+				"GameplayCameras",
+				"EnhancedInput"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

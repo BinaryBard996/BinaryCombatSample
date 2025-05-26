@@ -29,6 +29,14 @@
 		{
 			"Name": "GameplayAbilities",
 			"Enabled": true
+		},
+		{
+			"Name": "ModularGameplayActors",
+			"Enabled": true
+		},
+		{
+			"Name": "GameplayCameras",
+			"Enabled": true
 		}
 	]
 }
