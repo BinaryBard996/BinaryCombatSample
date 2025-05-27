@@ -33,7 +33,8 @@ public class BinaryCombat : ModuleRules
 				"GameplayAbilities",
 				"ModularGameplayActors",
 				"GameplayCameras",
-				"EnhancedInput"
+				"EnhancedInput",
+				"AIModule"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
