@@ -3,3 +3,6 @@
 
 #include "Input/BinaryEnhancedInputComponent.h"
 
+UBinaryEnhancedInputComponent::UBinaryEnhancedInputComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
+{
+}
