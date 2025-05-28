@@ -4,6 +4,7 @@
 #include "Character/BinaryCharacter.h"
 
 #include "Ability/BinaryAbilitySystemComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ABinaryCharacter::ABinaryCharacter(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
@@ -31,5 +32,27 @@ void ABinaryCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void ABinaryCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ABinaryCharacter, MyTeamId, COND_None);
+}
+
+void ABinaryCharacter::SetGenericTeamId(const FGenericTeamId& TeamID)
+{
+	MyTeamId = TeamID;
+}
+
+FGenericTeamId ABinaryCharacter::GetGenericTeamId() const
+{
+	return MyTeamId;
+}
+
+FOnBinaryTeamIndexChangedDelegate* ABinaryCharacter::GetOnTeamIndexChangedDelegate()
+{
+	return &OnTeamChangedDelegate;
 }
 

@@ -6,13 +6,13 @@
 #include "AbilitySystemInterface.h"
 #include "ModularCharacter.h"
 #include "GameFramework/Character.h"
+#include "Teams/BinaryTeamAgentInterface.h"
 #include "BinaryCharacter.generated.h"
 
 class UBinaryAbilitySystemComponent;
 
 UCLASS()
-class BINARYCOMBAT_API ABinaryCharacter
-	: public AModularCharacter
+class BINARYCOMBAT_API ABinaryCharacter: public AModularCharacter, public IBinaryTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -24,8 +24,19 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	// ~Actor interface
 
-protected:
+	// IBinaryTeamAgentInterface
+	virtual void SetGenericTeamId(const FGenericTeamId& TeamID) override;
+	virtual FGenericTeamId GetGenericTeamId() const override;
+	virtual FOnBinaryTeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
+	// ~IBinaryTeamAgentInterface
 
+protected:
+	UPROPERTY(Replicated)
+	FGenericTeamId MyTeamId;
+
+	UPROPERTY()
+	FOnBinaryTeamIndexChangedDelegate OnTeamChangedDelegate;
 };
