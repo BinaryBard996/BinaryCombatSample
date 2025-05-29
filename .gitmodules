@@ -1,4 +1,4 @@
 [submodule "Plugins/Flow"]
-	path = Plugins/Flow
+	path = Plugins/FlowGraph
 	url = https://github.com/MothCocoon/FlowGraph.git
-	branch = 5.0
+	branch = 5.x
