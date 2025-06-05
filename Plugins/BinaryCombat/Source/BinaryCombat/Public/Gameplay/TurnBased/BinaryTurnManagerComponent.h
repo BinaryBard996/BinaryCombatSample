@@ -18,12 +18,14 @@ class BINARYCOMBAT_API UBinaryTurnManagerComponent : public UGameStateComponent
 public:
 	void AddTurnPawn(APawn* TurnPawn);
 	void RemoveTurnPawn(APawn* TurnPawn);
-	void UpdateActionBar();
+	void UpdateTurnBar();
+	
+	bool GetCurrentTurnItem(FBinaryTurnItem& CurrentTurnItem) const;
 
 protected:
 	UPROPERTY()
 	TArray<FBinaryTurnItem> ReadyTurns;
 	
 	UPROPERTY()
-	TArray<FBinaryTurnItem> PendingTurns;
+	TArray<FBinaryTurnItem> TurnItems;
 };

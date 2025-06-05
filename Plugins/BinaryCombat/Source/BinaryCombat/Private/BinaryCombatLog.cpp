@@ -6,6 +6,7 @@
 DEFINE_LOG_CATEGORY(LogBinary);
 DEFINE_LOG_CATEGORY(LogBinaryTeams);
 DEFINE_LOG_CATEGORY(LogBinaryAbilitySystem);
+DEFINE_LOG_CATEGORY(LogBinaryTurn);
 
 FString GetClientServerContextString(UObject* ContextObject)
 {
