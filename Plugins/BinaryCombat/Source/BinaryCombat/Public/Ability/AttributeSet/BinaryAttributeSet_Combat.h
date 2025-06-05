@@ -17,9 +17,12 @@ class BINARYCOMBAT_API UBinaryAttributeSet_Combat : public UBinaryAttributeSet
 
 public:
 	ATTRIBUTE_ACCESSORS(UBinaryAttributeSet_Combat, BaseDamage);
-
+	ATTRIBUTE_ACCESSORS(UBinaryAttributeSet_Combat, Speed);
 
 private:
 	UPROPERTY(BlueprintReadOnly, Category="Binary|AttributeSet", meta=(AllowPrivateAccess=true))
 	FGameplayAttributeData BaseDamage;
+
+	UPROPERTY(BlueprintReadOnly, Category="Binary|AttributeSet", meta=(AllowPrivateAccess=true))
+	FGameplayAttributeData Speed;
 };
