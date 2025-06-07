@@ -21,3 +21,5 @@ BinaryCombatSample.sln
 /Plugins/ModularGameplayActors/Intermediate
 /Plugins/ModularGameplayActors/Binaries
 /Content/Developers
+/Plugins/GameplayMessageRouter/Binaries
+/Plugins/GameplayMessageRouter/Intermediate

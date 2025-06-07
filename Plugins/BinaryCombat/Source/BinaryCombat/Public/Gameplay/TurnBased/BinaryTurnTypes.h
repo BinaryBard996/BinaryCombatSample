@@ -5,6 +5,13 @@
 
 class UBinaryPawnTurnComponent;
 
+UENUM(BlueprintType)
+enum class EBinaryTurnActionType: uint8
+{
+	Invalid,
+	Default,
+};
+
 USTRUCT(BlueprintType)
 struct BINARYCOMBAT_API FBinaryTurnItem
 {
@@ -24,6 +31,11 @@ struct BINARYCOMBAT_API FBinaryTurnAction
 
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<APawn> TurnPawn;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UBinaryPawnTurnComponent> PawnTurnComponent;
+
+	EBinaryTurnActionType ActionType = EBinaryTurnActionType::Invalid;
 };
 
 

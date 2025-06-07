@@ -6,6 +6,12 @@
 #include "BinaryCombatLog.h"
 #include "Gameplay/TurnBased/BinaryPawnTurnComponent.h"
 
+void UBinaryTurnManagerComponent::ClearTurnSystem()
+{
+	TurnItems.Reset();
+	TurnActions.Reset();
+}
+
 void UBinaryTurnManagerComponent::AddTurnPawn(APawn* TurnPawn)
 {
 	if(!IsValid(TurnPawn))
@@ -33,27 +39,46 @@ void UBinaryTurnManagerComponent::RemoveTurnPawn(APawn* TurnPawn)
 	});
 }
 
-void UBinaryTurnManagerComponent::UpdateTurnBar()
+void UBinaryTurnManagerComponent::GenerateTurnActionQueue()
 {
-	TurnItems.Sort([](const FBinaryTurnItem& TurnItemA, const FBinaryTurnItem& TurnItemB)
+	TArray<FBinaryTurnAction> PendingTurnActions;
+	for(const auto& TurnItem: TurnItems)
 	{
-		float SpeedA = IsValid(TurnItemA.PawnTurnComponent) ? TurnItemA.PawnTurnComponent->GetTurnSpeed() : 0.f;
-		float SpeedB = IsValid(TurnItemB.PawnTurnComponent) ? TurnItemB.PawnTurnComponent->GetTurnSpeed() : 0.f;
+		FBinaryTurnAction TurnAction;
+		TurnAction.TurnPawn = TurnItem.TurnPawn;
+		TurnAction.PawnTurnComponent = TurnItem.PawnTurnComponent;
+		TurnAction.ActionType = EBinaryTurnActionType::Default;
+		PendingTurnActions.Emplace(TurnAction);
+	}
+
+	PendingTurnActions.Sort([](const FBinaryTurnAction& TurnActionA, const FBinaryTurnAction& TurnActionB)
+	{
+		const float SpeedA = IsValid(TurnActionA.PawnTurnComponent) ? TurnActionA.PawnTurnComponent->GetTurnSpeed() : 0.f;
+		const float SpeedB = IsValid(TurnActionB.PawnTurnComponent) ? TurnActionB.PawnTurnComponent->GetTurnSpeed() : 0.f;
 		return SpeedA >= SpeedB;
 	});
 
-	if(ReadyTurns.IsEmpty())
+	TurnActions.Append(PendingTurnActions);
+}
+
+void UBinaryTurnManagerComponent::ProcessNewTurn()
+{
+	if(TurnActions.IsEmpty())
 	{
-		ReadyTurns = TurnItems;
+		GenerateTurnActionQueue();
+	}
+
+	if(!TurnActions.IsEmpty())
+	{
+		CurrentTurnAction = TurnActions.Pop();
+	}
+	else
+	{
+		CurrentTurnAction = FBinaryTurnAction();
 	}
 }
 
-bool UBinaryTurnManagerComponent::GetCurrentTurnItem(FBinaryTurnItem& CurrentTurnItem) const
+FBinaryTurnAction UBinaryTurnManagerComponent::GetCurrentTurnAction() const
 {
-	if(!ReadyTurns.IsEmpty())
-	{
-		CurrentTurnItem = ReadyTurns.Top();
-		return true;
-	}
-	return false;
+	return CurrentTurnAction;
 }

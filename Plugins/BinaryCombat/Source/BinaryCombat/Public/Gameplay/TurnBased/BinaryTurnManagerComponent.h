@@ -16,16 +16,22 @@ class BINARYCOMBAT_API UBinaryTurnManagerComponent : public UGameStateComponent
 	GENERATED_BODY()
 
 public:
+	void ClearTurnSystem();
 	void AddTurnPawn(APawn* TurnPawn);
 	void RemoveTurnPawn(APawn* TurnPawn);
-	void UpdateTurnBar();
-	
-	bool GetCurrentTurnItem(FBinaryTurnItem& CurrentTurnItem) const;
+
+	void GenerateTurnActionQueue();
+	void ProcessNewTurn();
+
+	FBinaryTurnAction GetCurrentTurnAction() const;
 
 protected:
 	UPROPERTY()
-	TArray<FBinaryTurnItem> ReadyTurns;
+	TArray<FBinaryTurnAction> TurnActions;
 	
 	UPROPERTY()
 	TArray<FBinaryTurnItem> TurnItems;
+
+	UPROPERTY()
+	FBinaryTurnAction CurrentTurnAction;
 };
