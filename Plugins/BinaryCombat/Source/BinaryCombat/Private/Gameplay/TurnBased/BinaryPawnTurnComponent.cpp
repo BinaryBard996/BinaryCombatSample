@@ -14,6 +14,16 @@ void UBinaryPawnTurnComponent::BeginPlay()
 	check(OwningAbilitySystemComponent);
 }
 
+void UBinaryPawnTurnComponent::OnStartTurn()
+{
+	
+}
+
+void UBinaryPawnTurnComponent::OnEndTurn()
+{
+	
+}
+
 float UBinaryPawnTurnComponent::GetTurnSpeed() const
 {
 	return OwningAbilitySystemComponent->GetNumericAttribute(UBinaryAttributeSet_Combat::GetSpeedAttribute());

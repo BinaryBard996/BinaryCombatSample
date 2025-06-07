@@ -17,6 +17,11 @@ public:
 	// Component interface
 	virtual void BeginPlay() override;
 	// ~Component interface
+
+	// Turn Flow Functions
+	virtual void OnStartTurn();
+	virtual void OnEndTurn();
+	// ~Turn Flow Functions
 	
 	float GetTurnSpeed() const;
 
