@@ -10,20 +10,28 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(ClassGroup=(BinaryTurn), meta=(BlueprintSpawnableComponent))
 class BINARYCOMBAT_API UBinaryTurnManagerComponent : public UGameStateComponent
 {
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable)
 	void ClearTurnSystem();
+
+	UFUNCTION(BlueprintCallable)
 	void AddTurnPawn(APawn* TurnPawn);
+
+	UFUNCTION(BlueprintCallable)
 	void RemoveTurnPawn(APawn* TurnPawn);
 
-	void GenerateTurnActionQueue();
+	UFUNCTION(BlueprintCallable)
 	void ProcessNewTurn();
 
+	UFUNCTION(BlueprintCallable)
 	FBinaryTurnAction GetCurrentTurnAction() const;
+
+	void GenerateTurnActionQueue();
 
 protected:
 	UPROPERTY()

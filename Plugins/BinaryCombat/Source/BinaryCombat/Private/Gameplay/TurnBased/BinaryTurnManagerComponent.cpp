@@ -39,28 +39,6 @@ void UBinaryTurnManagerComponent::RemoveTurnPawn(APawn* TurnPawn)
 	});
 }
 
-void UBinaryTurnManagerComponent::GenerateTurnActionQueue()
-{
-	TArray<FBinaryTurnAction> PendingTurnActions;
-	for(const auto& TurnItem: TurnItems)
-	{
-		FBinaryTurnAction TurnAction;
-		TurnAction.TurnPawn = TurnItem.TurnPawn;
-		TurnAction.PawnTurnComponent = TurnItem.PawnTurnComponent;
-		TurnAction.ActionType = EBinaryTurnActionType::Default;
-		PendingTurnActions.Emplace(TurnAction);
-	}
-
-	PendingTurnActions.Sort([](const FBinaryTurnAction& TurnActionA, const FBinaryTurnAction& TurnActionB)
-	{
-		const float SpeedA = IsValid(TurnActionA.PawnTurnComponent) ? TurnActionA.PawnTurnComponent->GetTurnSpeed() : 0.f;
-		const float SpeedB = IsValid(TurnActionB.PawnTurnComponent) ? TurnActionB.PawnTurnComponent->GetTurnSpeed() : 0.f;
-		return SpeedA >= SpeedB;
-	});
-
-	TurnActions.Append(PendingTurnActions);
-}
-
 void UBinaryTurnManagerComponent::ProcessNewTurn()
 {
 	if(TurnActions.IsEmpty())
@@ -81,4 +59,26 @@ void UBinaryTurnManagerComponent::ProcessNewTurn()
 FBinaryTurnAction UBinaryTurnManagerComponent::GetCurrentTurnAction() const
 {
 	return CurrentTurnAction;
+}
+
+void UBinaryTurnManagerComponent::GenerateTurnActionQueue()
+{
+	TArray<FBinaryTurnAction> PendingTurnActions;
+	for(const auto& TurnItem: TurnItems)
+	{
+		FBinaryTurnAction TurnAction;
+		TurnAction.TurnPawn = TurnItem.TurnPawn;
+		TurnAction.PawnTurnComponent = TurnItem.PawnTurnComponent;
+		TurnAction.ActionType = EBinaryTurnActionType::Default;
+		PendingTurnActions.Emplace(TurnAction);
+	}
+
+	PendingTurnActions.Sort([](const FBinaryTurnAction& TurnActionA, const FBinaryTurnAction& TurnActionB)
+	{
+		const float SpeedA = IsValid(TurnActionA.PawnTurnComponent) ? TurnActionA.PawnTurnComponent->GetTurnSpeed() : 0.f;
+		const float SpeedB = IsValid(TurnActionB.PawnTurnComponent) ? TurnActionB.PawnTurnComponent->GetTurnSpeed() : 0.f;
+		return SpeedA >= SpeedB;
+	});
+
+	TurnActions.Append(PendingTurnActions);
 }
