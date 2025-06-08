@@ -37,6 +37,10 @@
 		{
 			"Name": "GameplayCameras",
 			"Enabled": true
+		},
+		{
+			"Name": "Flow",
+			"Enabled": true
 		}
 	]
 }

@@ -4,7 +4,11 @@
 #include "Gameplay/TurnBased/BinaryPawnTurnComponent.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "BinaryCombatTags.h"
 #include "Ability/AttributeSet/BinaryAttributeSet_Combat.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
+#include "Gameplay/TurnBased/BinaryTurnTypes.h"
+#include "Kismet/GameplayStatics.h"
 
 void UBinaryPawnTurnComponent::BeginPlay()
 {
@@ -12,14 +16,28 @@ void UBinaryPawnTurnComponent::BeginPlay()
 
 	OwningAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner());
 	check(OwningAbilitySystemComponent);
+
+	UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(this);
+	StartTurnListenerHandle = GameplayMessageSubsystem.RegisterListenerToActor(GetOwner(), BinaryCombatTags::Message_Turn_StartTurn, this, &ThisClass::OnStartTurn);
+	EndTurnListenerHandle = GameplayMessageSubsystem.RegisterListenerToActor(GetOwner(), BinaryCombatTags::Message_Turn_StartTurn, this, &ThisClass::OnEndTurn);
 }
 
-void UBinaryPawnTurnComponent::OnStartTurn()
+void UBinaryPawnTurnComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	
+	Super::EndPlay(EndPlayReason);
+
+	UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(this);
+	GameplayMessageSubsystem.UnregisterListener(StartTurnListenerHandle);
+	GameplayMessageSubsystem.UnregisterListener(EndTurnListenerHandle);
 }
 
-void UBinaryPawnTurnComponent::OnEndTurn()
+void UBinaryPawnTurnComponent::OnStartTurn(FGameplayTag MessageTag, const FBinaryTurnCommonMessage& MessageData)
+{
+	// Tick Turn
+	UAbilitySystemBlueprintLibrary::TickTurn(OwningAbilitySystemComponent, 1);
+}
+
+void UBinaryPawnTurnComponent::OnEndTurn(FGameplayTag MessageTag, const FBinaryTurnCommonMessage& MessageData)
 {
 	
 }

@@ -35,7 +35,8 @@ public class BinaryCombat : ModuleRules
 				"GameplayCameras",
 				"EnhancedInput",
 				"AIModule",
-				"Flow"
+				"Flow",
+				"GameplayMessageRuntime",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

@@ -1,15 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Gameplay/TurnBased/Flow/BFN_TurnBased_StartTurn.h"
+#include "Gameplay/TurnBased/Flow/BFN_Turn_StartTurn.h"
 
 #include "BinaryCombatLog.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
 #include "Gameplay/TurnBased/BinaryPawnTurnComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 #define START_PIN_NAME FName("In")
 #define END_PIN_NAME FName("Out")
 
-UBFN_TurnBased_StartTurn::UBFN_TurnBased_StartTurn(const FObjectInitializer& ObjectInitializer)
+UBFN_Turn_StartTurn::UBFN_Turn_StartTurn(const FObjectInitializer& ObjectInitializer)
 {
 #if WITH_EDITOR
 	Category = "TurnBased";
@@ -17,7 +19,7 @@ UBFN_TurnBased_StartTurn::UBFN_TurnBased_StartTurn(const FObjectInitializer& Obj
 	
 }
 
-void UBFN_TurnBased_StartTurn::ExecuteInput(const FName& PinName)
+void UBFN_Turn_StartTurn::ExecuteInput(const FName& PinName)
 {
 	if(PinName == START_PIN_NAME)
 	{
@@ -25,7 +27,7 @@ void UBFN_TurnBased_StartTurn::ExecuteInput(const FName& PinName)
 	}
 }
 
-void UBFN_TurnBased_StartTurn::StartTurn()
+void UBFN_Turn_StartTurn::StartTurn()
 {
 	UBinaryTurnManagerComponent* TurnManagerComponent = GetBinaryTurnManagerComponent();
 	check(TurnManagerComponent);
@@ -38,13 +40,18 @@ void UBFN_TurnBased_StartTurn::StartTurn()
 		return;
 	}
 
-	if(!IsValid(CurrentTurnAction.TurnPawn) || !IsValid(CurrentTurnAction.PawnTurnComponent))
+	if(!IsValid(CurrentTurnAction.TurnPawn))
 	{
 		UE_LOG(LogBinaryTurn, Error, TEXT("StartTurn-Invalid TurnPawn"))
 		TriggerOutput(END_PIN_NAME);
 		return;
 	}
 
-	CurrentTurnAction.PawnTurnComponent->OnStartTurn();
+	FBinaryTurnCommonMessage Message;
+	Message.TurnActionData = CurrentTurnAction;
+
+	UGameplayMessageSubsystem* MessageSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UGameplayMessageSubsystem>();
+	MessageSubsystem->BroadcastMessageToActor(CurrentTurnAction.TurnPawn, BinaryCombatTags::Message_Turn_StartTurn, Message);
+	
 	TriggerOutput(END_PIN_NAME);
 }

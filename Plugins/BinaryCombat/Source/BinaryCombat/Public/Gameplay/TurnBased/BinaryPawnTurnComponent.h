@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "Components/PawnComponent.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
 #include "BinaryPawnTurnComponent.generated.h"
 
+struct FBinaryTurnCommonMessage;
 
 UCLASS(ClassGroup=(BinaryTurn), meta=(BlueprintSpawnableComponent))
 class BINARYCOMBAT_API UBinaryPawnTurnComponent : public UPawnComponent
@@ -16,11 +18,12 @@ class BINARYCOMBAT_API UBinaryPawnTurnComponent : public UPawnComponent
 public:
 	// Component interface
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	// ~Component interface
 
 	// Turn Flow Functions
-	virtual void OnStartTurn();
-	virtual void OnEndTurn();
+	virtual void OnStartTurn(FGameplayTag MessageTag, const FBinaryTurnCommonMessage& MessageData);
+	virtual void OnEndTurn(FGameplayTag MessageTag, const FBinaryTurnCommonMessage& MessageData);
 	// ~Turn Flow Functions
 	
 	float GetTurnSpeed() const;
@@ -28,5 +31,7 @@ public:
 protected:
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> OwningAbilitySystemComponent;
-	
+
+	FGameplayMessageListenerHandle StartTurnListenerHandle;
+	FGameplayMessageListenerHandle EndTurnListenerHandle;
 };

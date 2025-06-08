@@ -218,7 +218,7 @@ public:
 	 * @return a handle that can be used to unregister this listener (either by calling Unregister() on the handle or calling UnregisterListener on the router)
 	 */
 	template <typename FMessageStructType>
-	FGameplayMessageListenerHandle RegisterListenerToActor(FGameplayTag Channel, AActor* TargetActor, TFunction<void(FGameplayTag, const FMessageStructType&)>&& Callback, EGameplayMessageMatch MatchType = EGameplayMessageMatch::ExactMatch)
+	FGameplayMessageListenerHandle RegisterListenerToActor(AActor* TargetActor, FGameplayTag Channel, TFunction<void(FGameplayTag, const FMessageStructType&)>&& Callback, EGameplayMessageMatch MatchType = EGameplayMessageMatch::ExactMatch)
 	{
 		auto ThunkCallback = [InnerCallback = MoveTemp(Callback)](FGameplayTag ActualTag, const UScriptStruct* SenderStructType, const void* SenderPayload)
 		{
@@ -234,16 +234,17 @@ public:
 	 * Executes a weak object validity check to ensure the object registering the function still exists before triggering the callback
 	 *
 	 * @param Channel			The message channel to listen to
-	 * @param OwnerActor			The object instance to call the function on
+	 * @param TargetActor			The object instance to call the function on
 	 * @param Function			Member function to call with the message when someone broadcasts it (must be the same type of UScriptStruct provided by broadcasters for this channel, otherwise an error will be logged)
 	 *
 	 * @return a handle that can be used to unregister this listener (either by calling Unregister() on the handle or calling UnregisterListener on the router)
 	 */
-	template <typename FMessageStructType, typename TOwner = AActor>
-	FGameplayMessageListenerHandle RegisterListenerToActor(FGameplayTag Channel, TOwner* OwnerActor, void(TOwner::* Function)(FGameplayTag, const FMessageStructType&))
+	template <typename FMessageStructType, typename TOwner = UObject>
+	FGameplayMessageListenerHandle RegisterListenerToActor(AActor* TargetActor, FGameplayTag Channel, TOwner* Object, void(TOwner::* Function)(FGameplayTag, const FMessageStructType&))
 	{
-		TWeakObjectPtr<TOwner> WeakObject(OwnerActor);
-		return RegisterListener<FMessageStructType>(
+		TWeakObjectPtr<TOwner> WeakObject(Object);
+		return RegisterListenerToActor<FMessageStructType>(
+			TargetActor,
 			Channel,
 			[WeakObject, Function](FGameplayTag Channel, const FMessageStructType& Payload)
 			{
@@ -251,9 +252,7 @@ public:
 				{
 					(StrongObject->*Function)(Channel, Payload);
 				}
-			},
-			true,
-			OwnerActor);
+			});
 	}
 
 	/**

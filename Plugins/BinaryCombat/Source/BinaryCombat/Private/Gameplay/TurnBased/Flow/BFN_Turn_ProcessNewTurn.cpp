@@ -1,15 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Gameplay/TurnBased/Flow/BFN_TurnBased_ProcessNewTurn.h"
+#include "Gameplay/TurnBased/Flow/BFN_Turn_ProcessNewTurn.h"
 
 #include "Gameplay/TurnBased/BinaryTurnManagerComponent.h"
 
 #define START_NAME FName("Start")
 #define NEW_TURN_NAME FName("NewTurn")
-#define NO_VALID_TURN_NAME FName("NoValidTurn")
+#define NO_VALID_TURN_NAME FName("InvalidTurn")
 
-UBFN_TurnBased_ProcessNewTurn::UBFN_TurnBased_ProcessNewTurn(const FObjectInitializer& ObjectInitializer)
+UBFN_Turn_ProcessNewTurn::UBFN_Turn_ProcessNewTurn(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
 #if WITH_EDITOR
@@ -22,7 +22,7 @@ UBFN_TurnBased_ProcessNewTurn::UBFN_TurnBased_ProcessNewTurn(const FObjectInitia
 	OutputPins.Add(FFlowPin(NO_VALID_TURN_NAME));
 }
 
-void UBFN_TurnBased_ProcessNewTurn::ExecuteInput(const FName& PinName)
+void UBFN_Turn_ProcessNewTurn::ExecuteInput(const FName& PinName)
 {
 	if(PinName == START_NAME)
 	{
@@ -30,7 +30,7 @@ void UBFN_TurnBased_ProcessNewTurn::ExecuteInput(const FName& PinName)
 	}
 }
 
-void UBFN_TurnBased_ProcessNewTurn::ProcessNewTurn()
+void UBFN_Turn_ProcessNewTurn::ProcessNewTurn()
 {
 	UBinaryTurnManagerComponent* TurnManagerComponent = GetBinaryTurnManagerComponent();
 	if(!TurnManagerComponent)
