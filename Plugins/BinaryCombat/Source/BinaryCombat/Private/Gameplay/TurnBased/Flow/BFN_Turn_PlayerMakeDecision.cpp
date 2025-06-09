@@ -1,17 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Gameplay/TurnBased/Flow/BFN_Turn_PlayerAction.h"
+#include "Gameplay/TurnBased/Flow/BFN_Turn_PlayerMakeDecision.h"
 
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "Gameplay/TurnBased/BinaryTurnLibrary.h"
 #include "Gameplay/TurnBased/BinaryTurnTypes.h"
 
-const FName UBFN_Turn_PlayerAction::INPIN_Start = TEXT("Start");
-const FName UBFN_Turn_PlayerAction::OUTPIN_End = TEXT("End");
-const FName UBFN_Turn_PlayerAction::OUTPIN_Invalid = TEXT("InvalidAction");
+const FName UBFN_Turn_PlayerMakeDecision::INPIN_Start = TEXT("Start");
+const FName UBFN_Turn_PlayerMakeDecision::OUTPIN_End = TEXT("MadeDecision");
+const FName UBFN_Turn_PlayerMakeDecision::OUTPIN_Invalid = TEXT("InvalidAction");
 
-UBFN_Turn_PlayerAction::UBFN_Turn_PlayerAction(const FObjectInitializer& ObjectInitializer)
+UBFN_Turn_PlayerMakeDecision::UBFN_Turn_PlayerMakeDecision(const FObjectInitializer& ObjectInitializer)
 {
 #if WITH_EDITOR
 	Category = TEXT("TurnBased");
@@ -24,7 +24,7 @@ UBFN_Turn_PlayerAction::UBFN_Turn_PlayerAction(const FObjectInitializer& ObjectI
 	OutputPins.Emplace(OUTPIN_End);
 }
 
-void UBFN_Turn_PlayerAction::ExecuteInput(const FName& PinName)
+void UBFN_Turn_PlayerMakeDecision::ExecuteInput(const FName& PinName)
 {
 	if(PinName == INPIN_Start)
 	{
@@ -32,14 +32,14 @@ void UBFN_Turn_PlayerAction::ExecuteInput(const FName& PinName)
 	}
 }
 
-void UBFN_Turn_PlayerAction::Finish()
+void UBFN_Turn_PlayerMakeDecision::Finish()
 {
 	Super::Finish();
 
 	EndListeningPlayerAction();
 }
 
-void UBFN_Turn_PlayerAction::PlayerActionStart()
+void UBFN_Turn_PlayerMakeDecision::PlayerActionStart()
 {
 	FBinaryTurnAction CurrentTurnAction;
 	bool bValidTurnAction = UBinaryTurnLibrary::GetCurrentTurnAction(this, CurrentTurnAction);
@@ -51,15 +51,15 @@ void UBFN_Turn_PlayerAction::PlayerActionStart()
 	}
 
 	auto& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(this);
-	GameplayMessageSubsystem.BroadcastMessage(BinaryCombatTags::Message_Turn_PlayerActionStart, CurrentTurnAction);
+	GameplayMessageSubsystem.BroadcastMessage(BinaryCombatTags::Message_Turn_PlayerMakeDecisionStart, CurrentTurnAction);
 
 	StartListeningPlayerAction();
 }
 
-void UBFN_Turn_PlayerAction::StartListeningPlayerAction()
+void UBFN_Turn_PlayerMakeDecision::StartListeningPlayerAction()
 {
 	auto& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(this);
-	PlayerActionListenerHandle = GameplayMessageSubsystem.RegisterListener<FBinaryTurnPlayerAction>(BinaryCombatTags::Message_Turn_PlayerActionReceive,
+	PlayerActionListenerHandle = GameplayMessageSubsystem.RegisterListener<FBinaryTurnPlayerAction>(BinaryCombatTags::Message_Turn_PlayerMakeDecisionEnd,
 		[this](FGameplayTag MessageTag, const FBinaryTurnPlayerAction& PlayerAction)
 		{
 			OnReceivePlayerAction(MessageTag, PlayerAction);
@@ -67,13 +67,13 @@ void UBFN_Turn_PlayerAction::StartListeningPlayerAction()
 		EGameplayMessageMatch::PartialMatch);
 }
 
-void UBFN_Turn_PlayerAction::EndListeningPlayerAction()
+void UBFN_Turn_PlayerMakeDecision::EndListeningPlayerAction()
 {
 	auto& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(this);
 	GameplayMessageSubsystem.UnregisterListener(PlayerActionListenerHandle);
 }
 
-void UBFN_Turn_PlayerAction::OnReceivePlayerAction(FGameplayTag MessageTag, const FBinaryTurnPlayerAction& PlayerAction)
+void UBFN_Turn_PlayerMakeDecision::OnReceivePlayerAction(FGameplayTag MessageTag, const FBinaryTurnPlayerAction& PlayerAction)
 {
 	// TODO. Switch on different action.
 	TriggerOutput(OUTPIN_End, true);

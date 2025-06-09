@@ -5,19 +5,19 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "Nodes/FlowNode.h"
-#include "BFN_Turn_PlayerAction.generated.h"
+#include "BFN_Turn_PlayerMakeDecision.generated.h"
 
 struct FBinaryTurnPlayerAction;
 /**
  * 
  */
-UCLASS(meta=(DisplayName="Player Action", KeyWords="TurnBased"))
-class BINARYCOMBAT_API UBFN_Turn_PlayerAction : public UFlowNode
+UCLASS(meta=(DisplayName="Player Make Decision", KeyWords="TurnBased"))
+class BINARYCOMBAT_API UBFN_Turn_PlayerMakeDecision : public UFlowNode
 {
 	GENERATED_BODY()
 
 public:
-	UBFN_Turn_PlayerAction(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UBFN_Turn_PlayerMakeDecision(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	// FlowNode interface
