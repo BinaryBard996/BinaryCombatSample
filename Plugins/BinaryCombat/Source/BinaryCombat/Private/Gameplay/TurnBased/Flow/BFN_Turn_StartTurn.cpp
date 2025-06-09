@@ -6,6 +6,9 @@
 #include "BinaryCombatLog.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "Gameplay/TurnBased/BinaryPawnTurnComponent.h"
+#include "Gameplay/TurnBased/BinaryTurnLibrary.h"
+#include "Gameplay/TurnBased/BinaryTurnManagerComponent.h"
+#include "Gameplay/TurnBased/BinaryTurnTypes.h"
 #include "Kismet/GameplayStatics.h"
 
 #define START_PIN_NAME FName("In")
@@ -29,7 +32,7 @@ void UBFN_Turn_StartTurn::ExecuteInput(const FName& PinName)
 
 void UBFN_Turn_StartTurn::StartTurn()
 {
-	UBinaryTurnManagerComponent* TurnManagerComponent = GetBinaryTurnManagerComponent();
+	UBinaryTurnManagerComponent* TurnManagerComponent = UBinaryTurnLibrary::GetBinaryTurnManagerComponent(this);
 	check(TurnManagerComponent);
 
 	FBinaryTurnAction CurrentTurnAction = TurnManagerComponent->GetCurrentTurnAction();

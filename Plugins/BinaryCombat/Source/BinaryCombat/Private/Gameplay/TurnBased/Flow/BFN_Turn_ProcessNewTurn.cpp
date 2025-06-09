@@ -3,6 +3,7 @@
 
 #include "Gameplay/TurnBased/Flow/BFN_Turn_ProcessNewTurn.h"
 
+#include "Gameplay/TurnBased/BinaryTurnLibrary.h"
 #include "Gameplay/TurnBased/BinaryTurnManagerComponent.h"
 
 #define START_NAME FName("Start")
@@ -32,7 +33,7 @@ void UBFN_Turn_ProcessNewTurn::ExecuteInput(const FName& PinName)
 
 void UBFN_Turn_ProcessNewTurn::ProcessNewTurn()
 {
-	UBinaryTurnManagerComponent* TurnManagerComponent = GetBinaryTurnManagerComponent();
+	UBinaryTurnManagerComponent* TurnManagerComponent = UBinaryTurnLibrary::GetBinaryTurnManagerComponent(this);
 	if(!TurnManagerComponent)
 	{
 		TriggerOutput(NO_VALID_TURN_NAME);

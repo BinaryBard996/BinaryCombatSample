@@ -11,6 +11,7 @@ namespace BinaryCombatTags
 	BINARYCOMBAT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Turn_StartTurn);
 	BINARYCOMBAT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Turn_EndTurn);
 	BINARYCOMBAT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Turn_PlayerActionStart);
+	BINARYCOMBAT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Turn_PlayerActionReceive);
 }
 
 UENUM(BlueprintType)
@@ -53,6 +54,13 @@ struct BINARYCOMBAT_API FBinaryTurnCommonMessage
 
 	UPROPERTY(BlueprintReadOnly)
 	FBinaryTurnAction TurnActionData;
+};
+
+USTRUCT(BlueprintType)
+struct BINARYCOMBAT_API FBinaryTurnPlayerAction
+{
+	GENERATED_BODY()
+	
 };
 
 

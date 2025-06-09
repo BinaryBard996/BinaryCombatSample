@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Gameplay/TurnBased/Flow/BFN_Turn.h"
+#include "Nodes/FlowNode.h"
 #include "BFN_Turn_BranchPlayerTurn.generated.h"
 
 /**
  * 
  */
 UCLASS(meta=(DisplayName="Branch Player Turn", KeyWords="TurnBased"))
-class BINARYCOMBAT_API UBFN_Turn_BranchPlayerTurn : public UBFN_Turn
+class BINARYCOMBAT_API UBFN_Turn_BranchPlayerTurn : public UFlowNode
 {
 	GENERATED_BODY()
 

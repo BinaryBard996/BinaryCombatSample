@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BFN_Turn.h"
 #include "Nodes/FlowNode.h"
 #include "BFN_Turn_ProcessNewTurn.generated.h"
 
@@ -11,7 +10,7 @@
  * 
  */
 UCLASS(meta=(DisplayName="Process New Turn", Keywords="TurnBased"))
-class BINARYCOMBAT_API UBFN_Turn_ProcessNewTurn : public UBFN_Turn
+class BINARYCOMBAT_API UBFN_Turn_ProcessNewTurn : public UFlowNode
 {
 	GENERATED_BODY()
 

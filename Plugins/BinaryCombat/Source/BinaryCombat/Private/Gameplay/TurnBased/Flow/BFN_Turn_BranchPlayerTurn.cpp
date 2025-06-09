@@ -3,6 +3,9 @@
 
 #include "Gameplay/TurnBased/Flow/BFN_Turn_BranchPlayerTurn.h"
 
+#include "Gameplay/TurnBased/BinaryTurnLibrary.h"
+#include "Gameplay/TurnBased/BinaryTurnTypes.h"
+
 const FName UBFN_Turn_BranchPlayerTurn::INPIN_Evaluate = TEXT("Evaluate");
 const FName UBFN_Turn_BranchPlayerTurn::OUTPIN_Player = TEXT("Player");
 const FName UBFN_Turn_BranchPlayerTurn::OUTPIN_AI = TEXT("AI");
@@ -26,8 +29,9 @@ UBFN_Turn_BranchPlayerTurn::UBFN_Turn_BranchPlayerTurn(const FObjectInitializer&
 
 void UBFN_Turn_BranchPlayerTurn::ExecuteInput(const FName& PinName)
 {
-	const FBinaryTurnAction TurnAction = GetCurrentBinaryTurnAction();
-	if(TurnAction.ActionType == EBinaryTurnActionType::Invalid || !IsValid(TurnAction.TurnPawn))
+	FBinaryTurnAction TurnAction;
+	bool bValidTurnAction = UBinaryTurnLibrary::GetCurrentTurnAction(this, TurnAction);
+	if(!bValidTurnAction)
 	{
 		TriggerOutput(OUTPIN_Invalid);
 	}
