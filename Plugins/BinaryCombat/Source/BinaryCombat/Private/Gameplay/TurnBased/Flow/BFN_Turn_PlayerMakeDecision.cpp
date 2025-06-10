@@ -32,9 +32,9 @@ void UBFN_Turn_PlayerMakeDecision::ExecuteInput(const FName& PinName)
 	}
 }
 
-void UBFN_Turn_PlayerMakeDecision::Finish()
+void UBFN_Turn_PlayerMakeDecision::Cleanup()
 {
-	Super::Finish();
+	Super::Cleanup();
 
 	EndListeningPlayerAction();
 }
@@ -59,8 +59,8 @@ void UBFN_Turn_PlayerMakeDecision::PlayerActionStart()
 void UBFN_Turn_PlayerMakeDecision::StartListeningPlayerAction()
 {
 	auto& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(this);
-	PlayerActionListenerHandle = GameplayMessageSubsystem.RegisterListener<FBinaryTurnPlayerAction>(BinaryCombatTags::Message_Turn_PlayerMakeDecisionEnd,
-		[this](FGameplayTag MessageTag, const FBinaryTurnPlayerAction& PlayerAction)
+	PlayerActionListenerHandle = GameplayMessageSubsystem.RegisterListener<FBinaryTurnPawnAction>(BinaryCombatTags::Message_Turn_PlayerMakeDecisionEnd,
+		[this](FGameplayTag MessageTag, const FBinaryTurnPawnAction& PlayerAction)
 		{
 			OnReceivePlayerAction(MessageTag, PlayerAction);
 		},
@@ -73,8 +73,8 @@ void UBFN_Turn_PlayerMakeDecision::EndListeningPlayerAction()
 	GameplayMessageSubsystem.UnregisterListener(PlayerActionListenerHandle);
 }
 
-void UBFN_Turn_PlayerMakeDecision::OnReceivePlayerAction(FGameplayTag MessageTag, const FBinaryTurnPlayerAction& PlayerAction)
+void UBFN_Turn_PlayerMakeDecision::OnReceivePlayerAction(FGameplayTag MessageTag, const FBinaryTurnPawnAction& PlayerAction)
 {
 	// TODO. Switch on different action.
-	TriggerOutput(OUTPIN_End, true);
+	TriggerOutput(OUTPIN_End);
 }

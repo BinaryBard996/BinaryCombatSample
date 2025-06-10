@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "NativeGameplayTags.h"
+#include "StructUtils/InstancedStruct.h"
 #include "BinaryTurnTypes.generated.h"
 
 class UBinaryPawnTurnComponent;
@@ -19,6 +20,12 @@ enum class EBinaryTurnActionType: uint8
 {
 	Invalid,
 	Default,
+};
+
+UENUM(BlueprintType)
+enum class EBinaryTurnPawnActionType: uint8
+{
+	Move
 };
 
 USTRUCT(BlueprintType)
@@ -56,11 +63,32 @@ struct BINARYCOMBAT_API FBinaryTurnCommonMessage
 	FBinaryTurnAction TurnActionData;
 };
 
-USTRUCT(BlueprintType)
-struct BINARYCOMBAT_API FBinaryTurnPlayerAction
+USTRUCT()
+struct BINARYCOMBAT_API FBinaryTurnActionData
 {
 	GENERATED_BODY()
 	
+};
+
+USTRUCT(BlueprintType)
+struct BINARYCOMBAT_API FBinaryTurnActionData_Move
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ActionData")
+	FVector TargetLocation;
+};
+
+USTRUCT(BlueprintType)
+struct BINARYCOMBAT_API FBinaryTurnPawnAction
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EBinaryTurnPawnActionType ActionType = EBinaryTurnPawnActionType::Move;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta=(BaseStruct="/Script/BinaryCombat.FBinaryTurnActionData", ExcludeBaseStruct))
+	FInstancedStruct ActionInstancedData;
 };
 
 
