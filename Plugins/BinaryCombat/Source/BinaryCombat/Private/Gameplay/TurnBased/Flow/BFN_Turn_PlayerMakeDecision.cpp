@@ -5,6 +5,7 @@
 
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "Gameplay/TurnBased/BinaryTurnLibrary.h"
+#include "Gameplay/TurnBased/BinaryTurnManagerComponent.h"
 #include "Gameplay/TurnBased/BinaryTurnTypes.h"
 
 const FName UBFN_Turn_PlayerMakeDecision::INPIN_Start = TEXT("Start");
@@ -41,7 +42,7 @@ void UBFN_Turn_PlayerMakeDecision::Cleanup()
 
 void UBFN_Turn_PlayerMakeDecision::PlayerActionStart()
 {
-	FBinaryTurnAction CurrentTurnAction;
+	FBinaryTurn CurrentTurnAction;
 	bool bValidTurnAction = UBinaryTurnLibrary::GetCurrentTurnAction(this, CurrentTurnAction);
 
 	if(!bValidTurnAction)
@@ -59,8 +60,8 @@ void UBFN_Turn_PlayerMakeDecision::PlayerActionStart()
 void UBFN_Turn_PlayerMakeDecision::StartListeningPlayerAction()
 {
 	auto& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(this);
-	PlayerActionListenerHandle = GameplayMessageSubsystem.RegisterListener<FBinaryTurnPawnAction>(BinaryCombatTags::Message_Turn_PlayerMakeDecisionEnd,
-		[this](FGameplayTag MessageTag, const FBinaryTurnPawnAction& PlayerAction)
+	PlayerActionListenerHandle = GameplayMessageSubsystem.RegisterListener<FBinaryTurnAction>(BinaryCombatTags::Message_Turn_PlayerMakeDecisionEnd,
+		[this](FGameplayTag MessageTag, const FBinaryTurnAction& PlayerAction)
 		{
 			OnReceivePlayerAction(MessageTag, PlayerAction);
 		},
@@ -73,8 +74,16 @@ void UBFN_Turn_PlayerMakeDecision::EndListeningPlayerAction()
 	GameplayMessageSubsystem.UnregisterListener(PlayerActionListenerHandle);
 }
 
-void UBFN_Turn_PlayerMakeDecision::OnReceivePlayerAction(FGameplayTag MessageTag, const FBinaryTurnPawnAction& PlayerAction)
+void UBFN_Turn_PlayerMakeDecision::OnReceivePlayerAction(FGameplayTag MessageTag, const FBinaryTurnAction& PlayerAction)
 {
 	// TODO. Switch on different action.
+	if(UBinaryTurnManagerComponent* TurnManagerComponent = UBinaryTurnLibrary::GetBinaryTurnManagerComponent(this))
+	{
+		if(PlayerAction.IsValidTurnAction())
+		{
+			TurnManagerComponent->PushTurnAction(PlayerAction);
+		}
+	}
+
 	TriggerOutput(OUTPIN_End);
 }

@@ -6,7 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "BinaryTurnLibrary.generated.h"
 
-struct FBinaryTurnAction;
+struct FBinaryTurn;
 class UBinaryTurnManagerComponent;
 /**
  * 
@@ -21,5 +21,5 @@ public:
 	static UBinaryTurnManagerComponent* GetBinaryTurnManagerComponent(UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable, Category="Turn Gameplay", meta=(WorldContext="WorldContextObject"))
-	static bool GetCurrentTurnAction(UObject* WorldContextObject, FBinaryTurnAction& OutTurnAction);
+	static bool GetCurrentTurnAction(UObject* WorldContextObject, FBinaryTurn& OutTurnAction);
 };

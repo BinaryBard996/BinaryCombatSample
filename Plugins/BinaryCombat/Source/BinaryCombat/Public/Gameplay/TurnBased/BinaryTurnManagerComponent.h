@@ -16,6 +16,7 @@ class BINARYCOMBAT_API UBinaryTurnManagerComponent : public UGameStateComponent
 	GENERATED_BODY()
 
 public:
+	// Turn Start
 	UFUNCTION(BlueprintCallable)
 	void ClearTurnSystem();
 
@@ -29,16 +30,34 @@ public:
 	void ProcessNewTurn();
 
 	UFUNCTION(BlueprintCallable)
-	FBinaryTurnAction GetCurrentTurnAction() const;
+	FBinaryTurn GetCurrentTurn() const;
 
-	void GenerateTurnActionQueue();
+	void GenerateTurnQueue();
+	// ~Turn End
+
+	// Turn Actions Start
+	UFUNCTION(BlueprintCallable)
+	bool PopTurnAction(FBinaryTurnAction& TurnAction);
+
+	UFUNCTION(BlueprintCallable)
+	void PushTurnAction(const FBinaryTurnAction& TurnAction);
+
+	UFUNCTION(BlueprintCallable)
+	bool GetCurrentTurnAction(FBinaryTurnAction& TurnAction);
+	// ~Turn Actions End
 
 protected:
 	UPROPERTY()
-	TArray<FBinaryTurnAction> TurnActions;
+	TArray<FBinaryTurn> Turns;
 	
 	UPROPERTY()
 	TArray<FBinaryTurnItem> TurnItems;
+
+	UPROPERTY()
+	FBinaryTurn CurrentTurn;
+
+	UPROPERTY()
+	TArray<FBinaryTurnAction> PendingTurnActions;
 
 	UPROPERTY()
 	FBinaryTurnAction CurrentTurnAction;

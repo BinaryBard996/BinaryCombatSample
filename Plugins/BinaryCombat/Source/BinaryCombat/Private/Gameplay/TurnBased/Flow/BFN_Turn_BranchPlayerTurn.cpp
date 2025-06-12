@@ -29,7 +29,7 @@ UBFN_Turn_BranchPlayerTurn::UBFN_Turn_BranchPlayerTurn(const FObjectInitializer&
 
 void UBFN_Turn_BranchPlayerTurn::ExecuteInput(const FName& PinName)
 {
-	FBinaryTurnAction TurnAction;
+	FBinaryTurn TurnAction;
 	bool bValidTurnAction = UBinaryTurnLibrary::GetCurrentTurnAction(this, TurnAction);
 	if(!bValidTurnAction)
 	{

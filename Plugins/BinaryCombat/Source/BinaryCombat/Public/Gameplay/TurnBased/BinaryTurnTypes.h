@@ -25,6 +25,7 @@ enum class EBinaryTurnActionType: uint8
 UENUM(BlueprintType)
 enum class EBinaryTurnPawnActionType: uint8
 {
+	Invalid,
 	Move
 };
 
@@ -41,7 +42,7 @@ struct BINARYCOMBAT_API FBinaryTurnItem
 };
 
 USTRUCT(BlueprintType)
-struct BINARYCOMBAT_API FBinaryTurnAction
+struct BINARYCOMBAT_API FBinaryTurn
 {
 	GENERATED_BODY()
 
@@ -60,7 +61,7 @@ struct BINARYCOMBAT_API FBinaryTurnCommonMessage
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadOnly)
-	FBinaryTurnAction TurnActionData;
+	FBinaryTurn TurnActionData;
 };
 
 USTRUCT()
@@ -80,15 +81,22 @@ struct BINARYCOMBAT_API FBinaryTurnActionData_Move
 };
 
 USTRUCT(BlueprintType)
-struct BINARYCOMBAT_API FBinaryTurnPawnAction
+struct BINARYCOMBAT_API FBinaryTurnAction
 {
 	GENERATED_BODY()
 
+public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EBinaryTurnPawnActionType ActionType = EBinaryTurnPawnActionType::Move;
+	TObjectPtr<APawn> TurnPawn; 
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EBinaryTurnPawnActionType ActionType = EBinaryTurnPawnActionType::Invalid;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta=(BaseStruct="/Script/BinaryCombat.FBinaryTurnActionData", ExcludeBaseStruct))
 	FInstancedStruct ActionInstancedData;
+
+	void Reset();
+	bool IsValidTurnAction() const;
 };
 
 

@@ -7,7 +7,7 @@
 #include "Nodes/FlowNode.h"
 #include "BFN_Turn_PlayerMakeDecision.generated.h"
 
-struct FBinaryTurnPawnAction;
+struct FBinaryTurnAction;
 /**
  * 
  */
@@ -30,7 +30,7 @@ protected:
 	void StartListeningPlayerAction();
 	void EndListeningPlayerAction();
 
-	void OnReceivePlayerAction(FGameplayTag MessageTag, const FBinaryTurnPawnAction& PlayerAction);
+	void OnReceivePlayerAction(FGameplayTag MessageTag, const FBinaryTurnAction& PlayerAction);
 
 public:
 	static const FName INPIN_Start;

@@ -35,7 +35,7 @@ void UBFN_Turn_StartTurn::StartTurn()
 	UBinaryTurnManagerComponent* TurnManagerComponent = UBinaryTurnLibrary::GetBinaryTurnManagerComponent(this);
 	check(TurnManagerComponent);
 
-	FBinaryTurnAction CurrentTurnAction = TurnManagerComponent->GetCurrentTurnAction();
+	FBinaryTurn CurrentTurnAction = TurnManagerComponent->GetCurrentTurn();
 	if(CurrentTurnAction.ActionType == EBinaryTurnActionType::Invalid)
 	{
 		UE_LOG(LogBinaryTurn, Error, TEXT("StartTurn-Invalid action"))

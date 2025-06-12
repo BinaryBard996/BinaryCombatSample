@@ -41,7 +41,7 @@ void UBFN_Turn_ProcessNewTurn::ProcessNewTurn()
 	}
 	
 	TurnManagerComponent->ProcessNewTurn();	
-	FBinaryTurnAction CurrentTurnAction = TurnManagerComponent->GetCurrentTurnAction();
+	FBinaryTurn CurrentTurnAction = TurnManagerComponent->GetCurrentTurn();
 
 	if(CurrentTurnAction.ActionType == EBinaryTurnActionType::Invalid)
 	{
