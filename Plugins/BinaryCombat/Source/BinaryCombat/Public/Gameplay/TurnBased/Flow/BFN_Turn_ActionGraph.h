@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Nodes/Graph/FlowNode_SubGraph.h"
-#include "BFN_Turn_TurnAction.generated.h"
+#include "BFN_Turn_ActionGraph.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class BINARYCOMBAT_API UBFN_Turn_TurnAction : public UFlowNode_SubGraph
+class BINARYCOMBAT_API UBFN_Turn_ActionGraph : public UFlowNode_SubGraph
 {
 	GENERATED_BODY()
 

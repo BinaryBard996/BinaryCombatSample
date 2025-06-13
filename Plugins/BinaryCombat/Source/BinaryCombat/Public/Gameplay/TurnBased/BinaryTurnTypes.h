@@ -13,6 +13,9 @@ namespace BinaryCombatTags
 	BINARYCOMBAT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Turn_EndTurn);
 	BINARYCOMBAT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Turn_PlayerMakeDecisionStart);
 	BINARYCOMBAT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Turn_PlayerMakeDecisionEnd);
+
+	BINARYCOMBAT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Turn_Action);
+	BINARYCOMBAT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Turn_Action_Move);
 }
 
 UENUM(BlueprintType)
@@ -89,8 +92,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<APawn> TurnPawn; 
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EBinaryTurnPawnActionType ActionType = EBinaryTurnPawnActionType::Invalid;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta=(GameplayTagFilter="Turn.Action"))
+	FGameplayTag ActionType;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta=(BaseStruct="/Script/BinaryCombat.FBinaryTurnActionData", ExcludeBaseStruct))
 	FInstancedStruct ActionInstancedData;
