@@ -47,7 +47,7 @@ void UBFN_Turn_PlayerMakeDecision::PlayerActionStart()
 
 	if(!bValidTurnAction)
 	{
-		TriggerOutput(OUTPIN_Invalid);
+		TriggerOutput(OUTPIN_Invalid, true);
 		return;
 	}
 
@@ -85,5 +85,5 @@ void UBFN_Turn_PlayerMakeDecision::OnReceivePlayerAction(FGameplayTag MessageTag
 		}
 	}
 
-	TriggerOutput(OUTPIN_End);
+	TriggerOutput(OUTPIN_End, true);
 }

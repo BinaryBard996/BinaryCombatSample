@@ -36,7 +36,7 @@ void UBFN_Turn_ProcessNewTurn::ProcessNewTurn()
 	UBinaryTurnManagerComponent* TurnManagerComponent = UBinaryTurnLibrary::GetBinaryTurnManagerComponent(this);
 	if(!TurnManagerComponent)
 	{
-		TriggerOutput(NO_VALID_TURN_NAME);
+		TriggerOutput(NO_VALID_TURN_NAME, true);
 		return;
 	}
 	
@@ -45,9 +45,9 @@ void UBFN_Turn_ProcessNewTurn::ProcessNewTurn()
 
 	if(CurrentTurnAction.ActionType == EBinaryTurnActionType::Invalid)
 	{
-		TriggerOutput(NO_VALID_TURN_NAME);
+		TriggerOutput(NO_VALID_TURN_NAME, true);
 		return;
 	}
 
-	TriggerOutput(NEW_TURN_NAME);
+	TriggerOutput(NEW_TURN_NAME, true);
 }

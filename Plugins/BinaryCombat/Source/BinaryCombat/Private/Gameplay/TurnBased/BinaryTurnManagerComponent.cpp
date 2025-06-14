@@ -106,3 +106,8 @@ bool UBinaryTurnManagerComponent::GetCurrentTurnAction(FBinaryTurnAction& TurnAc
 	TurnAction = CurrentTurnAction;
 	return TurnAction.IsValidTurnAction();
 }
+
+bool UBinaryTurnManagerComponent::IsPendingTurnActionEmpty() const
+{
+	return PendingTurnActions.IsEmpty();
+}

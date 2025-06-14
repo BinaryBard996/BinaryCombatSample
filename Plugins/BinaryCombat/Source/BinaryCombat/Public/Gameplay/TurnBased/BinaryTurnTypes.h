@@ -56,6 +56,8 @@ struct BINARYCOMBAT_API FBinaryTurn
 	TObjectPtr<UBinaryPawnTurnComponent> PawnTurnComponent;
 
 	EBinaryTurnActionType ActionType = EBinaryTurnActionType::Invalid;
+
+	bool IsValidTurn() const;
 };
 
 USTRUCT(BlueprintType)

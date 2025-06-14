@@ -42,8 +42,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PushTurnAction(const FBinaryTurnAction& TurnAction);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, meta=(ExpandBoolAsExecs=ReturnValue))
 	bool GetCurrentTurnAction(FBinaryTurnAction& TurnAction);
+
+	UFUNCTION(BlueprintPure)
+	bool IsPendingTurnActionEmpty() const;
 	// ~Turn Actions End
 
 protected:

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Gameplay/TurnBased/Flow/BFN_Turn_BranchPlayerTurn.h"
+#include "Gameplay/TurnBased/Flow/Branch/BFN_Turn_BranchPlayerTurn.h"
 
 #include "Gameplay/TurnBased/BinaryTurnLibrary.h"
 #include "Gameplay/TurnBased/BinaryTurnTypes.h"
@@ -14,7 +14,7 @@ const FName UBFN_Turn_BranchPlayerTurn::OUTPIN_Invalid = TEXT("InvalidTurn");
 UBFN_Turn_BranchPlayerTurn::UBFN_Turn_BranchPlayerTurn(const FObjectInitializer& ObjectInitializer)
 {
 #if WITH_EDITOR
-	Category = TEXT("TurnBased|Logic");
+	Category = TEXT("TurnBased|Branch");
 	NodeDisplayStyle = FlowNodeStyle::Logic;
 #endif
 	InputPins.Empty();
@@ -33,11 +33,11 @@ void UBFN_Turn_BranchPlayerTurn::ExecuteInput(const FName& PinName)
 	bool bValidTurnAction = UBinaryTurnLibrary::GetCurrentTurnAction(this, TurnAction);
 	if(!bValidTurnAction)
 	{
-		TriggerOutput(OUTPIN_Invalid);
+		TriggerOutput(OUTPIN_Invalid, true);
 	}
 	else
 	{
 		// TODO.
-		TriggerOutput(OUTPIN_Player);
+		TriggerOutput(OUTPIN_Player, true);
 	}
 }

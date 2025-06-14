@@ -9,15 +9,20 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "Turn Action Graph"))
 class BINARYCOMBAT_API UBFN_Turn_ActionGraph : public UFlowNode_SubGraph
 {
 	GENERATED_BODY()
 
 public:
+	UBFN_Turn_ActionGraph(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	// FlowNode interface
 	virtual void ExecuteInput(const FName& PinName) override;
+	virtual void Cleanup() override;
 	// ~FlowNode interface
+
+	bool IsPendingActionEmpty();
+	
 };

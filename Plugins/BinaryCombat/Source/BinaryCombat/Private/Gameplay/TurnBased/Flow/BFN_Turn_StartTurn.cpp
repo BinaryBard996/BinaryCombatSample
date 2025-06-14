@@ -27,34 +27,23 @@ void UBFN_Turn_StartTurn::ExecuteInput(const FName& PinName)
 	if(PinName == START_PIN_NAME)
 	{
 		StartTurn();
+		TriggerOutput(END_PIN_NAME, true);
 	}
 }
 
 void UBFN_Turn_StartTurn::StartTurn()
 {
-	UBinaryTurnManagerComponent* TurnManagerComponent = UBinaryTurnLibrary::GetBinaryTurnManagerComponent(this);
-	check(TurnManagerComponent);
-
-	FBinaryTurn CurrentTurnAction = TurnManagerComponent->GetCurrentTurn();
-	if(CurrentTurnAction.ActionType == EBinaryTurnActionType::Invalid)
+	if(UBinaryTurnManagerComponent* TurnManagerComponent = UBinaryTurnLibrary::GetBinaryTurnManagerComponent(this))
 	{
-		UE_LOG(LogBinaryTurn, Error, TEXT("StartTurn-Invalid action"))
-		TriggerOutput(END_PIN_NAME);
-		return;
+		FBinaryTurn CurrentTurn = TurnManagerComponent->GetCurrentTurn();
+		if(CurrentTurn.IsValidTurn())
+		{
+			FBinaryTurnCommonMessage Message;
+			Message.TurnActionData = CurrentTurn;
+
+			UGameplayMessageSubsystem* MessageSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UGameplayMessageSubsystem>();
+			MessageSubsystem->BroadcastMessage(BinaryCombatTags::Message_Turn_StartTurn, Message);
+			MessageSubsystem->BroadcastMessageToActor(CurrentTurn.TurnPawn, BinaryCombatTags::Message_Turn_StartTurn, Message);
+		}
 	}
-
-	if(!IsValid(CurrentTurnAction.TurnPawn))
-	{
-		UE_LOG(LogBinaryTurn, Error, TEXT("StartTurn-Invalid TurnPawn"))
-		TriggerOutput(END_PIN_NAME);
-		return;
-	}
-
-	FBinaryTurnCommonMessage Message;
-	Message.TurnActionData = CurrentTurnAction;
-
-	UGameplayMessageSubsystem* MessageSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UGameplayMessageSubsystem>();
-	MessageSubsystem->BroadcastMessageToActor(CurrentTurnAction.TurnPawn, BinaryCombatTags::Message_Turn_StartTurn, Message);
-	
-	TriggerOutput(END_PIN_NAME);
 }
