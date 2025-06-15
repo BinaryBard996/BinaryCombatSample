@@ -43,7 +43,7 @@ void UBFN_Turn_PlayerMakeDecision::Cleanup()
 void UBFN_Turn_PlayerMakeDecision::PlayerActionStart()
 {
 	FBinaryTurn CurrentTurnAction;
-	bool bValidTurnAction = UBinaryTurnLibrary::GetCurrentTurnAction(this, CurrentTurnAction);
+	bool bValidTurnAction = UBinaryTurnLibrary::GetCurrentTurn(this, CurrentTurnAction);
 
 	if(!bValidTurnAction)
 	{

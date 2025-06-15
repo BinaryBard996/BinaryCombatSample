@@ -20,6 +20,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Turn Gameplay", meta=(WorldContext="WorldContextObject"))
 	static UBinaryTurnManagerComponent* GetBinaryTurnManagerComponent(UObject* WorldContextObject);
 
-	UFUNCTION(BlueprintCallable, Category="Turn Gameplay", meta=(WorldContext="WorldContextObject"))
-	static bool GetCurrentTurnAction(UObject* WorldContextObject, FBinaryTurn& OutTurnAction);
+	UFUNCTION(BlueprintCallable, Category="Turn Gameplay", meta=(WorldContext="WorldContextObject", ExpandBoolAsExecs=ReturnValue))
+	static bool GetCurrentTurn(UObject* WorldContextObject, FBinaryTurn& OutTurn);
 };

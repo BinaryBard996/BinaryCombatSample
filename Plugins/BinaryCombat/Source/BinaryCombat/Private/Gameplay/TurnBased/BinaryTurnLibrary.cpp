@@ -19,12 +19,12 @@ UBinaryTurnManagerComponent* UBinaryTurnLibrary::GetBinaryTurnManagerComponent(U
 	return nullptr;
 }
 
-bool UBinaryTurnLibrary::GetCurrentTurnAction(UObject* WorldContextObject, FBinaryTurn& OutTurnAction)
+bool UBinaryTurnLibrary::GetCurrentTurn(UObject* WorldContextObject, FBinaryTurn& OutTurn)
 {
 	if(UBinaryTurnManagerComponent* TurnManagerComponent = GetBinaryTurnManagerComponent(WorldContextObject))
 	{
-		OutTurnAction = TurnManagerComponent->GetCurrentTurn();
-		if(OutTurnAction.ActionType != EBinaryTurnActionType::Invalid)
+		OutTurn = TurnManagerComponent->GetCurrentTurn();
+		if(OutTurn.ActionType != EBinaryTurnActionType::Invalid)
 		{
 			return true;
 		}
