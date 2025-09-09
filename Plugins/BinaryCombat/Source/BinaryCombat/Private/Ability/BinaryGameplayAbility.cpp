@@ -27,33 +27,9 @@ void UBinaryGameplayAbility::GetAllAbilityAssetTags(const FGameplayAbilitySpec& 
 void UBinaryGameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnGiveAbility(ActorInfo, Spec);
-
-	InitGameplayAbilityData(ActorInfo, Spec);
 }
 
-void UBinaryGameplayAbility::InitGameplayAbilityData(const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilitySpec& Spec)
+FName UBinaryGameplayAbility::GetAbilityID() const
 {
-	UBinaryAbilitySystemGlobals& AbilitySystemGlobals = UBinaryAbilitySystemGlobals::Get();
-	const UDataTable* DataTable = AbilitySystemGlobals.GetAbilityDataTable();
-	if(!DataTable)
-	{
-		return;
-	}
-
-	FBinaryAbilityDataRow* Data = DataTable->FindRow<FBinaryAbilityDataRow>(AbilityID, "", false);
-	if(!Data)
-	{
-		return;
-	}
-
-	const int32 AbilityLevel = GetAbilityLevel();
-	if(!Data->LevelData.IsValidIndex(AbilityLevel))
-	{
-		UE_LOG(LogBinaryAbilitySystem, Error, TEXT("Novalid ability level data for ability: %s, ability id: %s."), *GetClass()->GetName(), *AbilityID.ToString());
-		return;
-	}
-
-	const float AbilityDamageRate = Data->LevelData[AbilityLevel].AbilityDamageRate;
-	GetCurrentAbilitySpec()->SetByCallerTagMagnitudes.Add(BinaryCombatTags::Ability_Attribute_DamageRate, AbilityDamageRate);
+	return AbilityID;
 }

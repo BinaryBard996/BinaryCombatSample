@@ -12,14 +12,12 @@ FGameplayEffectContext* UBinaryAbilitySystemGlobals::AllocGameplayEffectContext(
 	return new FBinaryGameplayEffectContext();
 }
 
-void UBinaryAbilitySystemGlobals::InitGlobalData()
+void UBinaryAbilitySystemGlobals::InitAbilitySystemData()
 {
-	Super::InitGlobalData();
-
 	const UBinaryAbilityDeveloperSettings* BinaryAbilityDeveloperSettings = GetDefault<UBinaryAbilityDeveloperSettings>();
-	if(BinaryAbilityDeveloperSettings->SoftAbilityDataTable)
+	if(BinaryAbilityDeveloperSettings->SoftAbilityDataTable.IsValid())
 	{
-		AbilityDataTable = BinaryAbilityDeveloperSettings->SoftAbilityDataTable.LoadSynchronous();
+		AbilityDataTable = Cast<UDataTable>(BinaryAbilityDeveloperSettings->SoftAbilityDataTable.TryLoad());
 	}
 }
 
@@ -28,9 +26,9 @@ UDataTable* UBinaryAbilitySystemGlobals::GetAbilityDataTable()
 	if(!AbilityDataTable)
 	{
 		const UBinaryAbilityDeveloperSettings* BinaryAbilityDeveloperSettings = GetDefault<UBinaryAbilityDeveloperSettings>();
-		if(BinaryAbilityDeveloperSettings->SoftAbilityDataTable)
+		if(BinaryAbilityDeveloperSettings->SoftAbilityDataTable.IsValid())
 		{
-			AbilityDataTable = BinaryAbilityDeveloperSettings->SoftAbilityDataTable.LoadSynchronous();
+			AbilityDataTable = Cast<UDataTable>(BinaryAbilityDeveloperSettings->SoftAbilityDataTable.TryLoad());
 		}
 	}
 

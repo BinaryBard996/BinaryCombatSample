@@ -37,6 +37,7 @@ public class BinaryCombat : ModuleRules
 				"AIModule",
 				"Flow",
 				"GameplayMessageRuntime",
+				"NetCore"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

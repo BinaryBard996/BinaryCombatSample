@@ -23,4 +23,17 @@ struct FBinaryGameplayEffectContext: public FGameplayEffectContext
 	{
 		return FBinaryGameplayEffectContext::StaticStruct();
 	};
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 };
+
+template<>
+struct TStructOpsTypeTraits<FBinaryGameplayEffectContext> : public TStructOpsTypeTraitsBase2<FBinaryGameplayEffectContext>
+{
+	enum
+	{
+		WithNetSerializer = true,
+		WithCopy = true
+	};
+};
+

@@ -4,7 +4,16 @@
 #include "Ability/BinaryAbilitySystemComponent.h"
 
 #include "BinaryCombatLog.h"
+#include "BinaryCombatTags.h"
+#include "Ability/BinaryAbilitySystemGlobals.h"
 #include "Ability/BinaryGameplayAbility.h"
+
+void UBinaryAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& AbilitySpec)
+{
+	Super::OnGiveAbility(AbilitySpec);
+
+	InitGameplayAbilityData(AbilitySpec);
+}
 
 FGameplayAbilitySpecHandle UBinaryAbilitySystemComponent::GiveAbilityWithParams(
 	const FBinaryAbilityInitParams& AbilityInitParams)
@@ -126,6 +135,39 @@ void UBinaryAbilitySystemComponent::RemoveActiveGameplayEffectAbilityAttributeMo
 	{
 		Pair.Value.RemoveAggregatorMod(EffectHandle);
 	}
+}
+
+void UBinaryAbilitySystemComponent::InitGameplayAbilityData(FGameplayAbilitySpec& AbilitySpec)
+{
+	UBinaryAbilitySystemGlobals& AbilitySystemGlobals = UBinaryAbilitySystemGlobals::Get();
+	const UDataTable* DataTable = AbilitySystemGlobals.GetAbilityDataTable();
+	if(!DataTable)
+	{
+		return;
+	}
+
+	UBinaryGameplayAbility* GameplayAbility = Cast<UBinaryGameplayAbility>(AbilitySpec.Ability);
+	if (!GameplayAbility)
+	{
+		return;
+	}
+
+	FName AbilityID = GameplayAbility->GetAbilityID();
+	FBinaryAbilityDataRow* Data = DataTable->FindRow<FBinaryAbilityDataRow>(AbilityID, "", false);
+	if(!Data)
+	{
+		return;
+	}
+	
+	const int32 AbilityLevel = AbilitySpec.Level;
+	if(!Data->LevelData.IsValidIndex(AbilityLevel))
+	{
+		UE_LOG(LogBinaryAbilitySystem, Error, TEXT("Novalid ability level data for ability: %s, ability id: %s."), *GetClass()->GetName(), *AbilityID.ToString());
+		return;
+	}
+
+	const float AbilityDamageRate = Data->LevelData[AbilityLevel].AbilityDamageRate;
+	AbilitySpec.SetByCallerTagMagnitudes.Add(BinaryCombatTags::Ability_Attribute_DamageRate, AbilityDamageRate);
 }
 
 

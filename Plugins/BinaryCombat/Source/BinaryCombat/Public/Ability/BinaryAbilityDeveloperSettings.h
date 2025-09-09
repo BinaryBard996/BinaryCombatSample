@@ -15,6 +15,6 @@ class UBinaryAbilityDeveloperSettings : public UDeveloperSettings
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(Config, EditDefaultsOnly, Category=Global)
-	TSoftObjectPtr<UDataTable> SoftAbilityDataTable;
+	UPROPERTY(Config, EditDefaultsOnly, Category=Global, meta=(DisplayName = "Global Curve Table", AllowedClasses="/Script/Engine.DataTable", ConfigRestartRequired=true))
+	FSoftObjectPath SoftAbilityDataTable;
 };

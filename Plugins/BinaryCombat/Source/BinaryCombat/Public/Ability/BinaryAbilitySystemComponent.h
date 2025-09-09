@@ -15,6 +15,11 @@ class BINARYCOMBAT_API UBinaryAbilitySystemComponent : public UAbilitySystemComp
 {
 	GENERATED_BODY()
 
+public:
+	// start of UBinaryAbilitySystemComponent
+	virtual void OnGiveAbility(FGameplayAbilitySpec& AbilitySpec) override;
+	// ~end of UBinaryAbilitySystemComponent
+
 	//------------------------------------------------------
 	//                  Common Functions
 	//------------------------------------------------------
@@ -37,6 +42,8 @@ public:
 	
 	void AddActiveGameplayEffectAbilityAttributeModifiers(const FActiveGameplayEffectHandle& EffectHandle, const TArray<FBinaryAbilityAttributeModifer>& Modifiers);
 	void RemoveActiveGameplayEffectAbilityAttributeModifiers(const FActiveGameplayEffectHandle& EffectHandle);
+
+	void InitGameplayAbilityData(FGameplayAbilitySpec& AbilitySpec);
 
 protected:
 	TMap<FGameplayTag, FBinaryAbilityAttributeAggregator> AbilityAttributeAggregators;

@@ -23,7 +23,7 @@ public:
 	
 	virtual FGameplayEffectContext* AllocGameplayEffectContext() const override;
 
-	virtual void InitGlobalData() override;
+	virtual void InitAbilitySystemData();
 	
 	UDataTable* GetAbilityDataTable();
 	FBinaryAbilityDataRow FindAbilityDataFromDataTable(FName RowName);

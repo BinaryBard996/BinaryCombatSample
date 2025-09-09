@@ -12,3 +12,8 @@ FBinaryGameplayEffectContext* FBinaryGameplayEffectContext::ExtractEffectContext
 	}
 	return nullptr;
 }
+
+bool FBinaryGameplayEffectContext::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	return FGameplayEffectContext::NetSerialize(Ar, Map, bOutSuccess);
+}

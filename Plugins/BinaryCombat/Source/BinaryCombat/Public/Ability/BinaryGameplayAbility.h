@@ -27,8 +27,10 @@ protected:
 	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 	// GameplayAbility END
 
-	virtual void InitGameplayAbilityData(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec);
-
+public:
+	UFUNCTION(BlueprintPure, Category = "Ability")
+	FName GetAbilityID() const;
+	
 protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Ability")
 	FName AbilityID;
